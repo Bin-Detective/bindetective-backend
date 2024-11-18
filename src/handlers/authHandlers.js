@@ -6,6 +6,7 @@
 // Expected request body: { "userId": "string", "userName": "string", "dateOfBirth": "string" }
 // Handler to create a new user
 // Expected request body: { "userName": "string", "dateOfBirth": "string" }
+
 exports.createUser = async (req, res) => {
   try {
     const { userName, dateOfBirth } = req.body;

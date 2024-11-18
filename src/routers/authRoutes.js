@@ -1,9 +1,9 @@
-// routes.js
+// authRoutes.js
 
 // Import necessary modules
 const express = require("express");
-const handlers = require("./handlers"); // Import handler functions from handlers.js
-const { authenticateToken } = require("./middleware/authenticateToken"); // Import the authentication middleware
+const handlers = require("../handlers/authHandlers"); // Import handler functions from handlers.js
+const { authenticateToken } = require("../middleware/authenticateToken"); // Import the authentication middleware
 
 const router = express.Router(); // Create a new router object to define route paths
 

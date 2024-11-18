@@ -3,7 +3,8 @@
 // Import necessary modules
 const express = require("express"); // Express framework for building web applications
 const bodyParser = require("body-parser"); // Middleware to parse incoming request bodies
-const routes = require("./routes"); // Custom routes for handling user-related requests
+const authRoutes = require("./routers/authRoutes"); // Custom routes for handling user-related requests
+const contentRoutes = require("./routers/contentRoutes"); // Custom routes for handling content-related requests
 
 // Load environment variables from .env file
 const path = require("path");
@@ -57,7 +58,10 @@ const app = express(); // Initialize Express app
 app.use(bodyParser.json());
 
 // Register user-related routes with '/users' prefix
-app.use("/users", routes);
+app.use("/users", authRoutes);
+
+// Register content related routes with '/content' prefix
+app.use("/articles", contentRoutes);
 
 // Start the Express server and listen for incoming requests on specified port
 app.listen(PORT, () => {

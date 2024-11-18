@@ -31,7 +31,7 @@ All endpoints require an authorization token in the request header.
 - URL : `/users`
 - Method : `POST`
 - Description : Creates a new user document in the `users` collection.
-- Request Header : `Authorization: Bearer <idToken>`
+- Request Header : `Authorization: Bearer <idToken>`, `Content-type: application/json`
 - Request Body :
 
 ```json

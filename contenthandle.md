@@ -17,9 +17,9 @@ This API enables CRUD operations on the `articles` collection. Each article docu
 
 ### Authentication
 
-All endpoints require an authorization token in the request header.
+some endpoints require an authorization token in the request header.
 
-- Header: `Authorization: Bearer <idToken>`
+- Header: `Content-type: application/json`
 
 ### Endpoints
 

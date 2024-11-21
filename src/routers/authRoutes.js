@@ -1,15 +1,19 @@
-// routes.js
+// authRoutes.js
 
 // Import necessary modules
 const express = require("express");
-const handlers = require("./handlers"); // Import handler functions from handlers.js
+const handlers = require("../handlers/authHandlers"); // Import handler functions from handlers.js
+const { authenticateToken } = require("../middleware/authenticateToken"); // Import the authentication middleware
 
 const router = express.Router(); // Create a new router object to define route paths
+
+// Apply the middleware to all routes
+router.use(authenticateToken);
 
 // Define routes and associate each route with a handler function in handlers.js
 
 // Route to create a new user in the database
-// POST /users - Body: { "userId": "string", "userName": "string", "dateOfBirth": "string" }
+// POST /users - Body: { "userName": "string", "dateOfBirth": "string" }
 router.post("/", handlers.createUser);
 
 // Route to get a user by ID

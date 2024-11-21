@@ -16,5 +16,5 @@ COPY . .
 # Expose the port your app will run on (Cloud Run automatically assigns a port)
 EXPOSE 7070
 
-# Run the application
-CMD ["node", "app.js"]
+# Run the web service on container startup.
+CMD [ "npm", "start" ]

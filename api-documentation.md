@@ -262,7 +262,8 @@ some endpoints require an authorization token in the request header.
   "author": "string", // required, name of the author
   "dateAdded": "string", // required, date added in the format YYYY-MM-DD
   "description": "string", // required, brief description
-  "content": "string" // required, full content of the article
+  "content": "string", // required, full content of the article
+  "thumbnailUrl": "string" // required, link of the article's thumbnail
 }
 ```
 
@@ -295,7 +296,8 @@ some endpoints require an authorization token in the request header.
     "author": "string",
     "dateAdded": "string",
     "description": "string",
-    "content": "string"
+    "content": "string",
+    "thumbnailUrl": "string"
   }
   ```
 
@@ -316,7 +318,8 @@ some endpoints require an authorization token in the request header.
   "author": "string", // optional
   "dateAdded": "string", // optional, format YYYY-MM-DD
   "description": "string", // optional
-  "content": "string" // optional
+  "content": "string", // optional
+  "thumbnailUrl": "string" // optional
 }
 ```
 
@@ -367,7 +370,8 @@ some endpoints require an authorization token in the request header.
       "author": "string",
       "dateAdded": "string",
       "description": "string",
-      "content": "string"
+      "content": "string",
+      "thumbnailUrl": "string"
     },
     {
       "contentId": "string",
@@ -375,7 +379,8 @@ some endpoints require an authorization token in the request header.
       "author": "string",
       "dateAdded": "string",
       "description": "string",
-      "content": "string"
+      "content": "string",
+      "thumbnailUrl": "string"
     },
     ...
   ]

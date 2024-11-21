@@ -3,11 +3,11 @@
 // Import uuidv4 for generating unique filenames for thumbnails
 const { v4: uuidv4 } = require("uuid");
 
-// Handler to create a new article with thumbnail
+// Handler to create a new article with thumbnail URL
 exports.createArticle = async (req, res) => {
   try {
-    // Extract article details and thumbnail from the request body
-    const { title, author, dateAdded, description, content, thumbnail } =
+    // Extract article details and thumbnail URL from the request body
+    const { title, author, dateAdded, description, content, thumbnailUrl } =
       req.body;
 
     // Create a new article object with the extracted details
@@ -17,26 +17,8 @@ exports.createArticle = async (req, res) => {
       dateAdded,
       description,
       content,
+      thumbnailUrl, // Include the thumbnail URL
     };
-
-    // If a thumbnail is provided, process and upload it to Firebase Storage
-    if (thumbnail) {
-      // Convert the base64-encoded thumbnail to a buffer
-      const thumbnailBuffer = Buffer.from(thumbnail, "base64");
-      // Generate a unique filename for the thumbnail
-      const thumbnailName = `${uuidv4()}.jpg`;
-      // Create a reference to the file in Firebase Storage
-      const file = bucket.file(thumbnailName);
-
-      // Upload the thumbnail buffer to Firebase Storage with appropriate metadata
-      await file.save(thumbnailBuffer, {
-        metadata: { contentType: "image/jpeg" },
-        public: true, // Make the file publicly accessible
-      });
-
-      // Add the URL of the uploaded thumbnail to the article object
-      newArticle.thumbnailUrl = `https://storage.googleapis.com/${bucket.name}/articleThumbs/${thumbnailName}`;
-    }
 
     // Add the new article to the Firestore 'articles' collection
     const docRef = await db.collection("articles").add(newArticle);
@@ -78,8 +60,8 @@ exports.updateArticleById = async (req, res) => {
   try {
     // Extract the article ID from the request parameters
     const { contentId } = req.params;
-    // Extract the updated article details and thumbnail from the request body
-    const { title, author, dateAdded, description, content, thumbnail } =
+    // Extract the updated article details and thumbnail URL from the request body
+    const { title, author, dateAdded, description, content, thumbnailUrl } =
       req.body;
 
     // Create an updated article object with the extracted details
@@ -89,26 +71,8 @@ exports.updateArticleById = async (req, res) => {
       dateAdded,
       description,
       content,
+      thumbnailUrl, // Include the updated thumbnail URL
     };
-
-    // If a new thumbnail is provided, process and upload it to Firebase Storage
-    if (thumbnail) {
-      // Convert the base64-encoded thumbnail to a buffer
-      const thumbnailBuffer = Buffer.from(thumbnail, "base64");
-      // Generate a unique filename for the thumbnail
-      const thumbnailName = `${uuidv4()}.jpg`;
-      // Create a reference to the file in Firebase Storage
-      const file = bucket.file(thumbnailName);
-
-      // Upload the thumbnail buffer to Firebase Storage with appropriate metadata
-      await file.save(thumbnailBuffer, {
-        metadata: { contentType: "image/jpeg" },
-        public: true, // Make the file publicly accessible
-      });
-
-      // Add the URL of the uploaded thumbnail to the updated article object
-      updatedArticle.thumbnailUrl = `https://storage.googleapis.com/${bucket.name}/${thumbnailName}`;
-    }
 
     // Update the article document in Firestore with the updated details
     await db.collection("articles").doc(contentId).update(updatedArticle);

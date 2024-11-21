@@ -30,7 +30,7 @@ if (!USE_FIRESTORE_EMULATOR && !USE_AUTH_EMULATOR) {
   // Firebase service account credentials
   const serviceAccountPath = process.env.SERVICE_ACCOUNT_PATH;
   const serviceAccount = require(serviceAccountPath);
-  // Initialize Firebase app with service account credentials
+  // Initialize Firebase app with service account
   console.log("Using Provided Credentials...");
   initializeApp({
     credential: cert(serviceAccount),

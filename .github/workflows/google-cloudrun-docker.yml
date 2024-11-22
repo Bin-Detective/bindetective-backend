@@ -84,24 +84,6 @@ jobs:
           docker build --tag "${DOCKER_TAG}" .
           docker push "${DOCKER_TAG}"
           
-   #   - name: 'Deploy to Cloud Run'
-
-        # END - Docker auth and build
-
-  #      uses: 'google-github-actions/deploy-cloudrun@33553064113a37d688aa6937bacbdc481580be17' # google-github-actions/deploy-cloudrun@v2
-#        with:
-     #     service: '${{ env.SERVICE }}'
-#          region: '${{ env.REGION }}'
-          # NOTE: If using a pre-built image, update the image name below:
-
-#          image: '${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.SERVICE }}:${{ github.sha }}'
-          # Specify machine properties for staging machine and scale to zero
- #         cpu: 1  # Set 1 CPU
-#          min-instances: 0  # Set scaling to zero
-#          max-instances: 1  # Optional: Set the maximum instances if required
- #         envs: |
-#            FIREBASE_STORAGE_BUCKET=${{ env.FIREBASE_STORAGE_BUCKET_ENV }}  # Inject firebase storage bucket env
-
       - name: 'Deploy to Cloud Run'
         uses: 'google-github-actions/deploy-cloudrun@v2'
         with:
@@ -114,9 +96,7 @@ jobs:
             --min-instances=0
             --max-instances=1
             --set-env-vars=FIREBASE_STORAGE_BUCKET=${{ env.FIREBASE_STORAGE_BUCKET_ENV }}
-            --service-account=${{ env.SERVICE_ACCOUNT }}
-      
-      
+           
       - name: 'Allow unauthenticated access'
         run: |
           gcloud run services add-iam-policy-binding ${{ env.SERVICE }} --region=${{ env.REGION }} --member=allUsers --role=roles/run.invoker

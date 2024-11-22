@@ -115,9 +115,10 @@ jobs:
             --max-instances=1
             --set-env-vars=FIREBASE_STORAGE_BUCKET=${{ env.FIREBASE_STORAGE_BUCKET_ENV }}
       
+      
       - name: 'Allow unauthenticated access'
         run: |
-          gcloud beta run services add-iam-policy-binding --region=asia-southeast2 --member=allUsers --role=roles/run.invoker bin-detective
+          gcloud run services add-iam-policy-binding ${{ env.SERVICE }} --region=${{ env.REGION }} --member=allUsers --role=roles/run.invoker
             
       # If required, use the Cloud Run URL output in later steps
       - name: 'Show output'

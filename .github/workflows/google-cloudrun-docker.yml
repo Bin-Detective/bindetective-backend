@@ -1,5 +1,5 @@
 # This workflow build and push a Docker container to Google Artifact Registry
-# and deploy it on Cloud Run when a commit is pushed to the "staging-gcr-autodeploy"
+# and deploy it on Cloud Run when a commit is pushed to the "main"
 # branch.
 #
 # To configure this workflow:
@@ -32,7 +32,7 @@ name: 'Build and Deploy to Cloud Run'
 on:
   push:
     branches:
-      - '"staging-gcr-autodeploy"'
+      - '"main"'
 
 env:
   PROJECT_ID: 'dicoding-submission-440805' 

@@ -114,6 +114,7 @@ jobs:
             --min-instances=0
             --max-instances=1
             --set-env-vars=FIREBASE_STORAGE_BUCKET=${{ env.FIREBASE_STORAGE_BUCKET_ENV }}
+            --service-account=${{ env.SERVICE_ACCOUNT }}
       
       
       - name: 'Allow unauthenticated access'

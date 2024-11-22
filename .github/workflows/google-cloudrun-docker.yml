@@ -33,6 +33,7 @@ on:
   push:
     branches:
       - '"main"'
+  workflow_dispatch:  # This allows manual trigger
 
 env:
   PROJECT_ID: 'dicoding-submission-440805' 

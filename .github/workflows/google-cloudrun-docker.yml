@@ -51,15 +51,21 @@ jobs:
       - name: 'Checkout'
         uses: 'actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332' # actions/checkout@v4
 
-      # Configure Workload Identity Federation and generate an access token.
-      #
+
       # See https://github.com/google-github-actions/auth for more options,
       # including authenticating via a JSON credentials file.
+      # Authenticate to Google Cloud using the service account key
       - id: 'auth'
         name: 'Authenticate to Google Cloud'
-      - uses: 'google-github-actions/auth@v2'
+        uses: google-github-actions/auth@v0.7.0  # Authentication action
         with:
-          credentials_json: ${{ secrets.GCP_SA_KEY }}  # Use the secret
+          credentials_json: ${{ secrets.GCP_SA_KEY }}  # Use the secret with the service account JSON key
+
+      # Configure gcloud CLI with the project and credentials
+      - name: 'Set up Google Cloud SDK'
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: "${{ env.PROJECT_ID }}"  # Use your project ID
         
       # BEGIN - Docker auth and build
       #

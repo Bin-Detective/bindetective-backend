@@ -59,7 +59,7 @@ jobs:
         name: 'Authenticate to Google Cloud'
         uses: google-github-actions/setup-gcloud@v2
         with:
-          project_id: "your-project-id"  # Replace with your Google Cloud project ID
+          project_id: "dicoding-submission-440805"  # Replace with your Google Cloud project ID
           credentials_json: ${{ secrets.GCP_SA_KEY }}  # Use the secret
 
       # BEGIN - Docker auth and build

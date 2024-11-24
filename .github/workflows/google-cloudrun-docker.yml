@@ -105,7 +105,7 @@ jobs:
             --set-env-vars IS_ON_DEV=false
             --set-env-vars IS_CRON_JOB_SCHEDULED=false
             --port=7070
-          skip-default-labels: true
+          skip_default_labels: true
 
            
       - name: 'Allow unauthenticated access'

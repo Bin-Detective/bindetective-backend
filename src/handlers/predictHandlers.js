@@ -84,6 +84,15 @@ exports.ImagePredict = async (req, res) => {
   } catch (error) {
     console.error("Error processing request:", error);
 
+    // Delete the temporary uploaded file in case of error
+    fs.unlink(imagePath, (err) => {
+      if (err) {
+        console.error("Error deleting temporary file:", err);
+      } else {
+        console.log("Temporary file deleted:", imagePath);
+      }
+    });
+
     // Check for specific error types and respond accordingly
     if (error.code === "storage/unauthorized") {
       return res

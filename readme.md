@@ -2,6 +2,7 @@
 
 - [User Management](#user-management)
 - [Article Management](#article-management)
+- [Prediction Management](#prediction-management)
 
 ## User Management
 
@@ -10,6 +11,7 @@ This API allows for CRUD operations on the users collection. Each user document 
 - `userId` (string): Unique identifier for each user.
 - `userName` (string): Name of the user.
 - `dateOfBirth` (string): Date of birth of the user (format: YYYY-MM-DD).
+- `predictCollection` (array): Array of document IDs corresponding to the user's prediction history.
 
 ### Base URL : `/users`
 
@@ -395,3 +397,101 @@ some endpoints require an authorization token in the request header.
   ```
 
   - **500 Internal Server Error**: An error occurred while fetching the articles.
+
+## Prediction Management
+
+This API allows for image prediction and managing prediction history.
+
+### Authentication
+
+- Header : `Authorization: Bearer <idToken>`
+
+### Endpoints
+
+- [Predict Image](#1-predict-image)
+- [Get All Predict History](#2-get-all-predict-history)
+
+### 1. Predict Image
+
+- URL : `predict`
+- Method : `POST`
+- Body : `multipart/form-data`
+  - Key: `image`
+  - Type: `file`
+- Response :
+
+  - `200 OK`
+
+    ```json
+    {
+      "imageUrl": "string",
+      "predicted_class": "string",
+      "waste_type": "string",
+      "probabilities": {
+        "class1": "float",
+        "class2": "float"
+      }
+    }
+    ```
+
+  - `400 Bad Request`
+
+    ```json
+    {
+      "message": "No image file provided"
+    }
+    ```
+
+  - `401 Unauthorized`
+
+    ```json
+    {
+      "message": "Unauthorized: No token provided"
+    }
+    ```
+
+  - `505 Internal Server Error`
+
+    ```json
+    {
+      "message": "Internal Server Error"
+    }
+    ```
+
+### 2. Get All Predict History
+
+- URL : `predict`
+- Method : `POST`
+- Body : `multipart/form-data`
+  - Key: `image`
+  - Type: `file`
+- Response :
+
+  - `200 OK`
+
+    ```json
+    {
+      "predictHistory": [
+        {
+          "id": "string",
+          "imageUrl": "string",
+          "predicted_class": "string",
+          "waste_type": "string",
+          "probabilities": {
+            "class1": "float",
+            "class2": "float"
+          },
+          "timestamp": "string",
+          "userId": "string"
+        }
+      ]
+    }
+    ```
+
+  - `500 Internal Server Error`
+
+    ```json
+    {
+      "message": "Internal Server Error"
+    }
+    ```

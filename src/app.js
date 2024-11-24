@@ -9,9 +9,10 @@ const predictRoutes = require("./routers/predictRoutes"); // Routes for handling
 const cron = require("node-cron"); // Package for scheduling tasks
 const fs = require("fs");
 const path = require("path");
+const dotenv = require("dotenv");
 
 // Load environment variables from .env file
-require("dotenv").config();
+dotenv.config();
 
 // Firebase Admin SDK initialization
 const { initializeApp, cert } = require("firebase-admin/app");
@@ -48,22 +49,24 @@ const cleanUploadsDir = () => {
   });
 };
 
-// Flag to check if the cron job has already been scheduled
-let isCronJobScheduled = false;
-
-// Schedule the task to run every 7 days if not already scheduled
-if (!isCronJobScheduled) {
+// Check if the cron job has already been scheduled
+if (process.env.IS_CRON_JOB_SCHEDULED !== "true") {
   cron.schedule("0 0 */7 * *", () => {
     console.log("Running scheduled task to clean uploads directory...");
     cleanUploadsDir();
   });
-  isCronJobScheduled = true;
+
+  // Update the environment variable to indicate that the cron job has been scheduled
+  process.env.IS_CRON_JOB_SCHEDULED = "true";
 }
 
 // Initialize Firebase app with service account credentials
 if (!IS_ON_DEV) {
+  const serviceAccountPath = process.env.SERVICE_ACCOUNT_PATH;
+  const serviceAccount = require(serviceAccountPath);
   console.log("Using default credentials");
   initializeApp({
+    credential: cert(serviceAccount),
     storageBucket: bucketPath,
   });
 
@@ -102,7 +105,7 @@ const app = express();
 app.use(bodyParser.json());
 
 // Use custom routes
-app.use("/users", authRoutes);
+app.use("/auth", authRoutes);
 app.use("/content", contentRoutes);
 app.use("/predict", predictRoutes);
 

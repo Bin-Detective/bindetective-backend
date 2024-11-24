@@ -21,13 +21,12 @@ const { getStorage } = require("firebase-admin/storage");
 const PORT = process.env.PORT || 7070;
 
 // Use environment variables to toggle emulator
-const USE_FIRESTORE_EMULATOR = process.env.USE_FIRESTORE_EMULATOR === "true";
-const USE_AUTH_EMULATOR = process.env.USE_AUTH_EMULATOR === "true";
+const IS_ON_DEV = process.env.IS_ON_DEV === "true";
 
 // Set Firestore instance as a global variable
 global.db = getFirestore();
 
-if (!USE_FIRESTORE_EMULATOR && !USE_AUTH_EMULATOR) {
+if (!IS_ON_DEV) {
   // Initialize Firebase app with service account credentials for production
   initializeApp();
 } else {

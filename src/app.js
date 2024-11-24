@@ -27,8 +27,11 @@ const bucketPath = process.env.FIREBASE_STORAGE_BUCKET;
 
 if (!IS_ON_DEV) {
   // Initialize Firebase app with service account credentials for production
+  const serviceAccountPath = process.env.SERVICE_ACCOUNT_PATH;
+  const serviceAccount = require(serviceAccountPath);
   console.log("Using default credentials");
   initializeApp({
+    credential: cert(serviceAccount),
     storageBucket: bucketPath,
   });
 

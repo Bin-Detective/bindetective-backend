@@ -21,6 +21,7 @@ exports.createUser = async (req, res) => {
     await db.collection("users").doc(userId).set({
       userName,
       dateOfBirth,
+      predictCollection: [],
     });
 
     res.status(201).send({ message: "User created successfully" }); // Send success response

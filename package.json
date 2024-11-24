@@ -18,6 +18,7 @@
     "express": "^4.21.1",
     "firebase": "^11.0.1",
     "firebase-admin": "^12.7.0",
-    "grpc-tools": "^1.12.4"
+    "grpc-tools": "^1.12.4",
+    "multer": "^1.4.5-lts.1"
   }
 }

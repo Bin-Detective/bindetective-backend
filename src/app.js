@@ -23,12 +23,18 @@ const PORT = process.env.PORT || 7070;
 // Use environment variables to toggle emulator
 const IS_ON_DEV = process.env.IS_ON_DEV === "true";
 
-// Set Firestore instance as a global variable
-global.db = getFirestore();
+const bucketPath = process.env.FIREBASE_STORAGE_BUCKET;
 
 if (!IS_ON_DEV) {
   // Initialize Firebase app with service account credentials for production
-  initializeApp();
+  console.log("Using default credentials");
+  initializeApp({
+    storageBucket: bucketPath,
+  });
+
+  // Set Firestore and Storage instances as global variables
+  global.db = getFirestore();
+  global.bucket = getStorage().bucket();
 } else {
   // Firebase service account credentials
   const serviceAccountPath = process.env.SERVICE_ACCOUNT_PATH;
@@ -37,7 +43,12 @@ if (!IS_ON_DEV) {
   console.log("Using Provided Credentials...");
   initializeApp({
     credential: cert(serviceAccount),
+    storageBucket: bucketPath,
   });
+
+  // Set Firestore and Storage instances as global variables
+  global.db = getFirestore();
+  global.bucket = getStorage().bucket();
 
   // Setup Firestore Emulator Config
   console.log("Using Firestore emulator...");

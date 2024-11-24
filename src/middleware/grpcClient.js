@@ -4,7 +4,7 @@ const fs = require("fs");
 require("dotenv").config(); // Load environment variables from .env file
 
 // Load the protobuf
-const PROTO_PATH = "../protos/waste_prediction.proto";
+const PROTO_PATH = "./protos/waste_prediction.proto";
 const packageDefinition = protoLoader.loadSync(PROTO_PATH, {
   keepCase: true,
   longs: String,

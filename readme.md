@@ -28,6 +28,7 @@ All endpoints require an authorization token in the request header.
 - [Update User By ID](#3-update-user-by-id)
 - [Delete User By ID](#4-delete-user-by-id)
 - [Get All Users](#5-get-all-users)
+- [Get User Predict Collection](#6-get-user-predict-collection)
 
 ### 1. Create User
 
@@ -223,6 +224,58 @@ All endpoints require an authorization token in the request header.
 
   - **500 Internal Server Error**: An error occurred while fetching the users.
 
+  ### 6. Get All User Predict Collection
+
+- URL : `/users/:userId/collections`
+- Method : `GET`
+- Request Header : `Authorization: Bearer <idToken>`
+- Response :
+
+  - **200 OK**: Returns an array of user objects.
+
+    ```json
+    {
+      "predictHistoryItems": [
+        {
+          "id": "string",
+          "imageUrl": "string",
+          "predicted_class": "string",
+          "waste_type": "string",
+          "probabilities": {
+            "class1": "float",
+            "class2": "float"
+          },
+          "timestamp": "string",
+          "userId": "string"
+        }
+      ]
+    }
+    ```
+
+  - **401 Unauthorized**: Authorization token missing or invalid.
+
+    ```json
+    {
+      "error": "Authorization token missing" // or "Unauthorized"
+    }
+    ```
+
+  - **404 Not Found**
+
+    ```json
+    {
+      "message": "User not found"
+    }
+    ```
+
+  - **500 Internal Server Error**
+
+    ```json
+    {
+      "message": "Internal Server Error"
+    }
+    ```
+
 ## Article Management
 
 This API enables CRUD operations on the `articles` collection. Each article document consists of the following fields:
@@ -398,9 +451,11 @@ some endpoints require an authorization token in the request header.
 
   - **500 Internal Server Error**: An error occurred while fetching the articles.
 
-## ML Waste Image Recognition
+## ML Waste Image Prediction
 
 This API allows for image prediction and managing prediction history.
+
+### Base URL `/predict`
 
 ### Authentication
 
@@ -413,7 +468,7 @@ This API allows for image prediction and managing prediction history.
 
 ### 1. Predict Image
 
-- URL : `predict`
+- URL : `/predict`
 - Method : `POST`
 - Body : `multipart/form-data`
   - Key: `image`
@@ -460,7 +515,7 @@ This API allows for image prediction and managing prediction history.
 
 ### 2. Get All Predict History
 
-- URL : `predict`
+- URL : `/predict/collections`
 - Method : `POST`
 - Body : `multipart/form-data`
   - Key: `image`

@@ -5,6 +5,7 @@ const express = require("express"); // Express framework for building web applic
 const bodyParser = require("body-parser"); // Middleware to parse incoming request bodies
 const authRoutes = require("./routers/authRoutes"); // Custom routes for handling user-related requests
 const contentRoutes = require("./routers/contentRoutes"); // Custom routes for handling content-related requests
+const predictRoutes = require("./routers/predictRoutes"); // Routes for handling the predict request to robin
 
 // Load environment variables from .env file
 const path = require("path");
@@ -68,7 +69,10 @@ app.use("/users", authRoutes);
 // Register content related routes with '/content' prefix
 app.use("/articles", contentRoutes);
 
-// Start the Express server and listen for incoming requests on specified port
+// Register image prediction route with '/predict' prefix
+app.use("/predict", predictRoutes);
+
+// Start the Express server and listen for incoming requedsts on specified port
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });

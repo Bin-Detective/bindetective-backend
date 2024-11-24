@@ -4,6 +4,7 @@
 const express = require("express");
 const handlers = require("../handlers/predictHandlers.js");
 const multer = require("multer");
+const { authenticateToken } = require("../middleware/authenticateToken"); // Import the authentication middleware
 
 const upload = multer({ dest: "uploads/" });
 const router = express.Router(); // Create router object to define root paths

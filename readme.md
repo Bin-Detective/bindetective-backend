@@ -2,7 +2,7 @@
 
 - [User Management](#user-management)
 - [Article Management](#article-management)
-- [Prediction Management](#prediction-management)
+- [ML Waste Image Prediction](#ml-waste-image-prediction)
 
 ## User Management
 
@@ -398,7 +398,7 @@ some endpoints require an authorization token in the request header.
 
   - **500 Internal Server Error**: An error occurred while fetching the articles.
 
-## Prediction Management
+## ML Waste Image Recognition
 
 This API allows for image prediction and managing prediction history.
 

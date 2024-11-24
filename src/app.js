@@ -12,7 +12,8 @@ const path = require("path");
 const dotenv = require("dotenv");
 
 // Load environment variables from .env file
-dotenv.config();
+const path = require("path");
+require("dotenv").config();
 
 // Firebase Admin SDK initialization
 const { initializeApp, cert } = require("firebase-admin/app");
@@ -62,11 +63,8 @@ if (process.env.IS_CRON_JOB_SCHEDULED !== "true") {
 
 // Initialize Firebase app with service account credentials
 if (!IS_ON_DEV) {
-  const serviceAccountPath = process.env.SERVICE_ACCOUNT_PATH;
-  const serviceAccount = require(serviceAccountPath);
   console.log("Using default credentials");
   initializeApp({
-    credential: cert(serviceAccount),
     storageBucket: bucketPath,
   });
 

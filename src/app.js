@@ -8,11 +8,10 @@ const contentRoutes = require("./routers/contentRoutes"); // Custom routes for h
 const predictRoutes = require("./routers/predictRoutes"); // Routes for handling the predict request to robin
 const cron = require("node-cron"); // Package for scheduling tasks
 const fs = require("fs");
-const PAth = require("path");
 const dotenv = require("dotenv");
 
 // Load environment variables from .env file
-const PAth = require("path");
+const path = require("path");
 require("dotenv").config();
 
 // Firebase Admin SDK initialization
@@ -31,7 +30,7 @@ const IS_ON_DEV = process.env.IS_ON_DEV === "true";
 const bucketPath = process.env.FIREBASE_STORAGE_BUCKET;
 
 // Ensure the uploads directory exists
-const uploadsDir = PAth.join(__dirname, "uploads");
+const uploadsDir = path.join(__dirname, "uploads");
 if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir);
 }
@@ -42,7 +41,7 @@ const cleanUploadsDir = () => {
     if (err) throw err;
 
     for (const file of files) {
-      fs.unlink(PAth.join(uploadsDir, file), (err) => {
+      fs.unlink(path.join(uploadsDir, file), (err) => {
         if (err) throw err;
       });
     }

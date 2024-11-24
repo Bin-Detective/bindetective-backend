@@ -20,9 +20,12 @@ const { getStorage } = require("firebase-admin/storage");
 // Set the port where the app will run
 const PORT = process.env.PORT || 7070;
 
-// Use a hard-coded flag to toggle emulator
-const USE_FIRESTORE_EMULATOR = process.env.USE_FIRESTORE_EMULATOR === "true"; // Set to `false` for deployment
-const USE_AUTH_EMULATOR = process.env.USE_AUTH_EMULATOR === "true"; // Set to `false` for deployment
+// Use environment variables to toggle emulator
+const USE_FIRESTORE_EMULATOR = process.env.USE_FIRESTORE_EMULATOR === "true";
+const USE_AUTH_EMULATOR = process.env.USE_AUTH_EMULATOR === "true";
+
+// Set Firestore instance as a global variable
+global.db = getFirestore();
 
 if (!USE_FIRESTORE_EMULATOR && !USE_AUTH_EMULATOR) {
   // Initialize Firebase app with service account credentials for production
@@ -36,20 +39,15 @@ if (!USE_FIRESTORE_EMULATOR && !USE_AUTH_EMULATOR) {
   initializeApp({
     credential: cert(serviceAccount),
   });
-}
 
-// Set Firestore instance as a global variable
-global.db = getFirestore();
-
-if (USE_FIRESTORE_EMULATOR) {
+  // Setup Firestore Emulator Config
   console.log("Using Firestore emulator...");
   db.settings({
     host: "localhost:8089", // Firestore emulator host
     ssl: false, // Disable SSL for the emulator connection
   });
-}
 
-if (USE_AUTH_EMULATOR) {
+  // Setup Auth emulator config
   console.log("Using Auth emulator...");
   process.env.FIREBASE_AUTH_EMULATOR_HOST = "localhost:9099"; // Auth emulator host
 }

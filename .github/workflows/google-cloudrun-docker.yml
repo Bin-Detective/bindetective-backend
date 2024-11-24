@@ -38,6 +38,10 @@ env:
   SERVICE: 'bin-detective' 
   SERVICE_ACCOUNT: 'bindetective@dicoding-submission-440805.iam.gserviceaccount.com' # Replace with the service account for Cloud Run
   FIREBASE_STORAGE_BUCKET_ENV: 'dicoding-submission-440805.firebasestorage.app'
+  ROBIN_GRPC_SERVICE: 'https://bin-detective-ml-grpc-476908432279.asia-southeast2.run.app'
+  ROBIN_GRPC_PORT: '50051'
+  IS_ON_DEV: 'false'
+  IS_CRON_JOB_SCHEDULED: 'false'
 
 jobs:
   deploy:
@@ -87,16 +91,22 @@ jobs:
       - name: 'Deploy to Cloud Run'
         uses: 'google-github-actions/deploy-cloudrun@v2'
         with:
-          service: '${{ env.SERVICE }}'
-          region: '${{ env.REGION }}'
-          image: '${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/bin-detective/bin-detective:${{ github.sha }}'
+          service: 'bin-detective'
+          region: 'asia-southeast2'
+          image: 'asia-southeast2-docker.pkg.dev/dicoding-submission-440805/bin-detective/bin-detective:${{ github.sha }}'
           flags: >-
             --cpu=2
             --memory=1024Mi
             --min-instances=0
             --max-instances=1
-            --set-env-vars=FIREBASE_STORAGE_BUCKET=${{ env.FIREBASE_STORAGE_BUCKET_ENV }}
+            --set-env-vars FIREBASE_STORAGE_BUCKET=dicoding-submission-440805.firebasestorage.app
+            --set-env-vars ROBIN_GRPC_SERVICE=https://bin-detective-ml-grpc-476908432279.asia-southeast2.run.app
+            --set-env-vars ROBIN_GRPC_PORT=50051
+            --set-env-vars IS_ON_DEV=false
+            --set-env-vars IS_CRON_JOB_SCHEDULED=false
             --port=7070
+          skip_default_labels: true
+
            
       - name: 'Allow unauthenticated access'
         run: |

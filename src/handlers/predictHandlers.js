@@ -4,7 +4,7 @@ const { v4: uuidv4 } = require("uuid");
 const { getAuth } = require("firebase-admin/auth");
 const { FieldValue } = require("firebase-admin/firestore");
 
-exports.handleImagePredict = async (req, res) => {
+exports.ImagePredict = async (req, res) => {
   // Check if an image file is provided
   if (!req.file) {
     return res.status(400).send({ message: "No image file provided" });
@@ -100,5 +100,20 @@ exports.handleImagePredict = async (req, res) => {
     } else {
       return res.status(500).send({ message: "Internal Server Error" });
     }
+  }
+};
+
+// Handler to list all documents in the 'predict_history' collection
+exports.getAllPredictHistory = async (req, res) => {
+  try {
+    const snapshot = await global.db.collection("predict_history").get();
+    const predictHistory = snapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+    res.status(200).send({ predictHistory });
+  } catch (error) {
+    console.error("Error listing predict history:", error);
+    res.status(500).send({ message: "Internal Server Error" });
   }
 };

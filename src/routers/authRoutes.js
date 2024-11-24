@@ -28,6 +28,9 @@ router.put("/:userId", handlers.updateUserById);
 // DELETE /users/:userId - Deletes the user with specified ID from the database
 router.delete("/:userId", handlers.deleteUserById);
 
+// Define the route for getting user's predictCollection items
+router.get("/user/:userId/collections", authHandlers.getUserPredictCollection);
+
 // Route to get all users
 // GET /users - Retrieves a list of all users in the database
 router.get("/", handlers.getAllUsers);

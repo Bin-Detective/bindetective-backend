@@ -13,8 +13,8 @@ const router = express.Router(); // Create router object to define root paths
 router.use(authenticateToken);
 
 // Define routes and associate each route with its respective handlers.
-router.post("/", upload.single("image"), handlers.handleImagePredict);
+router.post("/", upload.single("image"), handlers.ImagePredict);
 
-router.get("/collections", handlers.handleListCollection);
+router.get("/collections", handlers.getAllPredictHistory);
 
 module.exports = router;

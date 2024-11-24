@@ -6,9 +6,11 @@ const bodyParser = require("body-parser"); // Middleware to parse incoming reque
 const authRoutes = require("./routers/authRoutes"); // Custom routes for handling user-related requests
 const contentRoutes = require("./routers/contentRoutes"); // Custom routes for handling content-related requests
 const predictRoutes = require("./routers/predictRoutes"); // Routes for handling the predict request to robin
+const cron = require("node-cron"); // Package for scheduling tasks
+const fs = require("fs");
+const path = require("path");
 
 // Load environment variables from .env file
-const path = require("path");
 require("dotenv").config();
 
 // Firebase Admin SDK initialization
@@ -23,10 +25,43 @@ const PORT = process.env.PORT || 7070;
 // Use environment variables to toggle emulator
 const IS_ON_DEV = process.env.IS_ON_DEV === "true";
 
+// Firebase storage bucket name
 const bucketPath = process.env.FIREBASE_STORAGE_BUCKET;
 
+// Ensure the uploads directory exists
+const uploadsDir = path.join(__dirname, "uploads");
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir);
+}
+
+// Function to clean the uploads directory
+const cleanUploadsDir = () => {
+  fs.readdir(uploadsDir, (err, files) => {
+    if (err) throw err;
+
+    for (const file of files) {
+      fs.unlink(path.join(uploadsDir, file), (err) => {
+        if (err) throw err;
+      });
+    }
+    console.log("Uploads directory cleaned.");
+  });
+};
+
+// Flag to check if the cron job has already been scheduled
+let isCronJobScheduled = false;
+
+// Schedule the task to run every 7 days if not already scheduled
+if (!isCronJobScheduled) {
+  cron.schedule("0 0 */7 * *", () => {
+    console.log("Running scheduled task to clean uploads directory...");
+    cleanUploadsDir();
+  });
+  isCronJobScheduled = true;
+}
+
+// Initialize Firebase app with service account credentials
 if (!IS_ON_DEV) {
-  // Initialize Firebase app with service account credentials for production
   const serviceAccountPath = process.env.SERVICE_ACCOUNT_PATH;
   const serviceAccount = require(serviceAccountPath);
   console.log("Using default credentials");
@@ -39,10 +74,8 @@ if (!IS_ON_DEV) {
   global.db = getFirestore();
   global.bucket = getStorage().bucket();
 } else {
-  // Firebase service account credentials
   const serviceAccountPath = process.env.SERVICE_ACCOUNT_PATH;
   const serviceAccount = require(serviceAccountPath);
-  // Initialize Firebase app with service account
   console.log("Using Provided Credentials...");
   initializeApp({
     credential: cert(serviceAccount),
@@ -55,9 +88,9 @@ if (!IS_ON_DEV) {
 
   // Setup Firestore Emulator Config
   console.log("Using Firestore emulator...");
-  db.settings({
+  global.db.settings({
     host: "localhost:8089", // Firestore emulator host
-    ssl: false, // Disable SSL for the emulator connection
+    ssl: false,
   });
 
   // Setup Auth emulator config
@@ -65,25 +98,18 @@ if (!IS_ON_DEV) {
   process.env.FIREBASE_AUTH_EMULATOR_HOST = "localhost:9099"; // Auth emulator host
 }
 
-// Initialize Firebase Storage
-const storage = getStorage();
-global.bucket = storage.bucket(process.env.FIREBASE_STORAGE_BUCKET);
+// Initialize Express app
+const app = express();
 
-const app = express(); // Initialize Express app
-
-// Middleware to parse JSON request bodies
+// Middleware to parse JSON bodies
 app.use(bodyParser.json());
 
-// Register user-related routes with '/users' prefix
-app.use("/users", authRoutes);
-
-// Register content related routes with '/content' prefix
-app.use("/articles", contentRoutes);
-
-// Register image prediction route with '/predict' prefix
+// Use custom routes
+app.use("/auth", authRoutes);
+app.use("/content", contentRoutes);
 app.use("/predict", predictRoutes);
 
-// Start the Express server and listen for incoming requedsts on specified port
+// Start the server
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });

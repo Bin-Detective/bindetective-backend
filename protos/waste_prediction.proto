@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package wasteprediction;
+
+// Define the request message
+message PredictRequest {
+  bytes image = 1; // Binary image data
+}
+
+// Define the response message
+message PredictResponse {
+  string predicted_class = 1; // Class label with the highest probability
+  string waste_type = 2;      // Type of waste (organik, anorganik, B3)
+  map<string, float> probabilities = 3; // Probabilities for all classes
+}
+
+// Define the gRPC service
+service WastePrediction {
+  rpc PredictImage (PredictRequest) returns (PredictResponse);
+}

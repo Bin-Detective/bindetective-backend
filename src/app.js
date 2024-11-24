@@ -5,10 +5,14 @@ const express = require("express"); // Express framework for building web applic
 const bodyParser = require("body-parser"); // Middleware to parse incoming request bodies
 const authRoutes = require("./routers/authRoutes"); // Custom routes for handling user-related requests
 const contentRoutes = require("./routers/contentRoutes"); // Custom routes for handling content-related requests
+const predictRoutes = require("./routers/predictRoutes"); // Routes for handling the predict request to robin
+const cron = require("node-cron"); // Package for scheduling tasks
+const fs = require("fs");
+const path = require("path");
+const dotenv = require("dotenv");
 
 // Load environment variables from .env file
-const path = require("path");
-require("dotenv").config();
+dotenv.config();
 
 // Firebase Admin SDK initialization
 const { initializeApp, cert } = require("firebase-admin/app");
@@ -19,56 +23,93 @@ const { getStorage } = require("firebase-admin/storage");
 // Set the port where the app will run
 const PORT = process.env.PORT || 7070;
 
-// Use a hard-coded flag to toggle emulator
-const USE_FIRESTORE_EMULATOR = process.env.USE_FIRESTORE_EMULATOR === "true"; // Set to `false` for deployment
-const USE_AUTH_EMULATOR = process.env.USE_AUTH_EMULATOR === "true"; // Set to `false` for deployment
+// Use environment variables to toggle emulator
+const IS_ON_DEV = process.env.IS_ON_DEV === "true";
 
-if (!USE_FIRESTORE_EMULATOR && !USE_AUTH_EMULATOR) {
-  // Initialize Firebase app with service account credentials for production
-  initializeApp();
-} else {
-  // Firebase service account credentials
+// Firebase storage bucket name
+const bucketPath = process.env.FIREBASE_STORAGE_BUCKET;
+
+// Ensure the uploads directory exists
+const uploadsDir = path.join(__dirname, "uploads");
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir);
+}
+
+// Function to clean the uploads directory
+const cleanUploadsDir = () => {
+  fs.readdir(uploadsDir, (err, files) => {
+    if (err) throw err;
+
+    for (const file of files) {
+      fs.unlink(path.join(uploadsDir, file), (err) => {
+        if (err) throw err;
+      });
+    }
+    console.log("Uploads directory cleaned.");
+  });
+};
+
+// Check if the cron job has already been scheduled
+if (process.env.IS_CRON_JOB_SCHEDULED !== "true") {
+  cron.schedule("0 0 */7 * *", () => {
+    console.log("Running scheduled task to clean uploads directory...");
+    cleanUploadsDir();
+  });
+
+  // Update the environment variable to indicate that the cron job has been scheduled
+  process.env.IS_CRON_JOB_SCHEDULED = "true";
+}
+
+// Initialize Firebase app with service account credentials
+if (!IS_ON_DEV) {
   const serviceAccountPath = process.env.SERVICE_ACCOUNT_PATH;
   const serviceAccount = require(serviceAccountPath);
-  // Initialize Firebase app with service account
+  console.log("Using default credentials");
+  initializeApp({
+    credential: cert(serviceAccount),
+    storageBucket: bucketPath,
+  });
+
+  // Set Firestore and Storage instances as global variables
+  global.db = getFirestore();
+  global.bucket = getStorage().bucket();
+} else {
+  const serviceAccountPath = process.env.SERVICE_ACCOUNT_PATH;
+  const serviceAccount = require(serviceAccountPath);
   console.log("Using Provided Credentials...");
   initializeApp({
     credential: cert(serviceAccount),
+    storageBucket: bucketPath,
   });
-}
 
-// Set Firestore instance as a global variable
-global.db = getFirestore();
+  // Set Firestore and Storage instances as global variables
+  global.db = getFirestore();
+  global.bucket = getStorage().bucket();
 
-if (USE_FIRESTORE_EMULATOR) {
+  // Setup Firestore Emulator Config
   console.log("Using Firestore emulator...");
-  db.settings({
+  global.db.settings({
     host: "localhost:8089", // Firestore emulator host
-    ssl: false, // Disable SSL for the emulator connection
+    ssl: false,
   });
-}
 
-if (USE_AUTH_EMULATOR) {
+  // Setup Auth emulator config
   console.log("Using Auth emulator...");
   process.env.FIREBASE_AUTH_EMULATOR_HOST = "localhost:9099"; // Auth emulator host
 }
 
-// Initialize Firebase Storage
-const storage = getStorage();
-global.bucket = storage.bucket(process.env.FIREBASE_STORAGE_BUCKET);
+// Initialize Express app
+const app = express();
 
-const app = express(); // Initialize Express app
-
-// Middleware to parse JSON request bodies
+// Middleware to parse JSON bodies
 app.use(bodyParser.json());
 
-// Register user-related routes with '/users' prefix
-app.use("/users", authRoutes);
+// Use custom routes
+app.use("/auth", authRoutes);
+app.use("/content", contentRoutes);
+app.use("/predict", predictRoutes);
 
-// Register content related routes with '/content' prefix
-app.use("/articles", contentRoutes);
-
-// Start the Express server and listen for incoming requests on specified port
+// Start the server
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });

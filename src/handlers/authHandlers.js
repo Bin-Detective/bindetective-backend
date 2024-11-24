@@ -21,6 +21,7 @@ exports.createUser = async (req, res) => {
     await db.collection("users").doc(userId).set({
       userName,
       dateOfBirth,
+      predictCollection: [],
     });
 
     res.status(201).send({ message: "User created successfully" }); // Send success response
@@ -106,5 +107,37 @@ exports.getAllUsers = async (req, res) => {
   } catch (error) {
     console.error("Error fetching users:", error);
     res.status(500).send("Internal Server Error");
+  }
+};
+
+// Handler to get user's predictCollection items
+// URL parameter: :userId - ID of the user to retrieve predictCollection items for
+exports.getUserPredictCollection = async (req, res) => {
+  try {
+    const userId = req.params.userId; // Extract user ID from URL
+    const userDoc = await db.collection("users").doc(userId).get();
+
+    if (!userDoc.exists) {
+      return res.status(404).send({ message: "User not found" });
+    }
+
+    const userData = userDoc.data();
+    const predictCollection = userData.predictCollection || [];
+
+    // Fetch the corresponding items from the 'predict_history' collection
+    const predictHistoryPromises = predictCollection.map((id) =>
+      db.collection("predict_history").doc(id).get()
+    );
+    const predictHistoryDocs = await Promise.all(predictHistoryPromises);
+
+    const predictHistoryItems = predictHistoryDocs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+
+    res.status(200).send({ predictHistoryItems });
+  } catch (error) {
+    console.error("Error getting user's predictCollection items:", error);
+    res.status(500).send({ message: "Internal Server Error" });
   }
 };

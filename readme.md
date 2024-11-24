@@ -2,6 +2,7 @@
 
 - [User Management](#user-management)
 - [Article Management](#article-management)
+- [ML Waste Image Prediction](#ml-waste-image-prediction)
 
 ## User Management
 
@@ -10,6 +11,7 @@ This API allows for CRUD operations on the users collection. Each user document 
 - `userId` (string): Unique identifier for each user.
 - `userName` (string): Name of the user.
 - `dateOfBirth` (string): Date of birth of the user (format: YYYY-MM-DD).
+- `predictCollection` (array): Array of document IDs corresponding to the user's prediction history.
 
 ### Base URL : `/users`
 
@@ -26,6 +28,7 @@ All endpoints require an authorization token in the request header.
 - [Update User By ID](#3-update-user-by-id)
 - [Delete User By ID](#4-delete-user-by-id)
 - [Get All Users](#5-get-all-users)
+- [Get User Predict Collection](#6-get-user-predict-collection)
 
 ### 1. Create User
 
@@ -221,6 +224,58 @@ All endpoints require an authorization token in the request header.
 
   - **500 Internal Server Error**: An error occurred while fetching the users.
 
+  ### 6. Get All User Predict Collection
+
+- URL : `/users/:userId/collections`
+- Method : `GET`
+- Request Header : `Authorization: Bearer <idToken>`
+- Response :
+
+  - **200 OK**: Returns an array of user objects.
+
+    ```json
+    {
+      "predictHistoryItems": [
+        {
+          "id": "string",
+          "imageUrl": "string",
+          "predicted_class": "string",
+          "waste_type": "string",
+          "probabilities": {
+            "class1": "float",
+            "class2": "float"
+          },
+          "timestamp": "string",
+          "userId": "string"
+        }
+      ]
+    }
+    ```
+
+  - **401 Unauthorized**: Authorization token missing or invalid.
+
+    ```json
+    {
+      "error": "Authorization token missing" // or "Unauthorized"
+    }
+    ```
+
+  - **404 Not Found**
+
+    ```json
+    {
+      "message": "User not found"
+    }
+    ```
+
+  - **500 Internal Server Error**
+
+    ```json
+    {
+      "message": "Internal Server Error"
+    }
+    ```
+
 ## Article Management
 
 This API enables CRUD operations on the `articles` collection. Each article document consists of the following fields:
@@ -395,3 +450,103 @@ some endpoints require an authorization token in the request header.
   ```
 
   - **500 Internal Server Error**: An error occurred while fetching the articles.
+
+## ML Waste Image Prediction
+
+This API allows for image prediction and managing prediction history.
+
+### Base URL `/predict`
+
+### Authentication
+
+- Header : `Authorization: Bearer <idToken>`
+
+### Endpoints
+
+- [Predict Image](#1-predict-image)
+- [Get All Predict History](#2-get-all-predict-history)
+
+### 1. Predict Image
+
+- URL : `/predict`
+- Method : `POST`
+- Body : `multipart/form-data`
+  - Key: `image`
+  - Type: `file`
+- Response :
+
+  - `200 OK`
+
+    ```json
+    {
+      "imageUrl": "string",
+      "predicted_class": "string",
+      "waste_type": "string",
+      "probabilities": {
+        "class1": "float",
+        "class2": "float"
+      }
+    }
+    ```
+
+  - `400 Bad Request`
+
+    ```json
+    {
+      "message": "No image file provided"
+    }
+    ```
+
+  - `401 Unauthorized`
+
+    ```json
+    {
+      "message": "Unauthorized: No token provided"
+    }
+    ```
+
+  - `505 Internal Server Error`
+
+    ```json
+    {
+      "message": "Internal Server Error"
+    }
+    ```
+
+### 2. Get All Predict History
+
+- URL : `/predict/collections`
+- Method : `POST`
+- Body : `multipart/form-data`
+  - Key: `image`
+  - Type: `file`
+- Response :
+
+  - `200 OK`
+
+    ```json
+    {
+      "predictHistory": [
+        {
+          "id": "string",
+          "imageUrl": "string",
+          "predicted_class": "string",
+          "waste_type": "string",
+          "probabilities": {
+            "class1": "float",
+            "class2": "float"
+          },
+          "timestamp": "string",
+          "userId": "string"
+        }
+      ]
+    }
+    ```
+
+  - `500 Internal Server Error`
+
+    ```json
+    {
+      "message": "Internal Server Error"
+    }
+    ```

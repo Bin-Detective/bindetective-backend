@@ -29,7 +29,7 @@ router.put("/:userId", handlers.updateUserById);
 router.delete("/:userId", handlers.deleteUserById);
 
 // Define the route for getting user's predictCollection items
-router.get("/user/:userId/collections", authHandlers.getUserPredictCollection);
+router.get("/:userId/collections", handlers.getUserPredictCollection);
 
 // Route to get all users
 // GET /users - Retrieves a list of all users in the database

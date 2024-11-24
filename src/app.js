@@ -105,7 +105,7 @@ const app = express();
 app.use(bodyParser.json());
 
 // Use custom routes
-app.use("/auth", authRoutes);
+app.use("/users", authRoutes);
 app.use("/content", contentRoutes);
 app.use("/predict", predictRoutes);
 

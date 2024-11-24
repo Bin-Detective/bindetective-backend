@@ -47,7 +47,6 @@ exports.handleImagePredict = async (req, res) => {
 
       // Send the prediction response
       res.status(200).send({
-        imageUrl: url,
         predicted_class: response.predicted_class,
         waste_type: response.waste_type,
         probabilities: response.probabilities,

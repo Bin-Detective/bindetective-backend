@@ -1,5 +1,5 @@
 const { predictImage } = require("../middleware/grpcClient");
-const path = require("path");
+const PAth = require("path");
 const { v4: uuidv4 } = require("uuid");
 const { getAuth } = require("firebase-admin/auth");
 const { FieldValue } = require("firebase-admin/firestore");
@@ -27,8 +27,8 @@ exports.ImagePredict = async (req, res) => {
   }
 
   // Define the path and filename for the uploaded image
-  const imagePath = req.file.path;
-  const fileName = `${uuidv4()}${path.extname(req.file.originalname)}`;
+  const imagePath = req.file.PAth;
+  const fileName = `${uuidv4()}${PAth.extname(req.file.originalname)}`;
   const destination = `predictedUploads/${fileName}`;
 
   try {

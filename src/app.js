@@ -106,7 +106,7 @@ app.use(bodyParser.json());
 
 // Use custom routes
 app.use("/users", authRoutes);
-app.use("/content", contentRoutes);
+app.use("/articles", contentRoutes);
 app.use("/predict", predictRoutes);
 
 // Start the server

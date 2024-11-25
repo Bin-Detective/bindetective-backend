@@ -2,7 +2,7 @@ const axios = require("axios");
 require("dotenv").config(); // Load environment variables from .env file
 
 // Load service address and port from environment variables
-const serviceAddress = `${process.env.FASTAPI_SERVICE}:${process.env.FASTAPI_PORT}`;
+const serviceAddress = `${process.env.FASTAPI_SERVICE}`;
 
 async function predictImage(imageUrl) {
   try {

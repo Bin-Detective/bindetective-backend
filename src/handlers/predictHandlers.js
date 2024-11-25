@@ -1,11 +1,12 @@
-const { predictImage } = require("../middleware/grpcClient");
 const path = require("path");
 const { v4: uuidv4 } = require("uuid");
-const fs = require("fs");
 const { getAuth } = require("firebase-admin/auth");
 const { FieldValue } = require("firebase-admin/firestore");
+const fs = require("fs");
+const { predictImage } = require("../middleware/restClient");
 
-exports.ImagePredict = async (req, res) => {
+// Handler to predict image
+exports.handleImagePredict = async (req, res) => {
   // Check if an image file is provided
   if (!req.file) {
     return res.status(400).send({ message: "No image file provided" });
@@ -33,6 +34,9 @@ exports.ImagePredict = async (req, res) => {
   const destination = `predictedUploads/${fileName}`;
 
   try {
+    // Log the image path to verify it is being stored correctly
+    console.log("Image path:", imagePath);
+
     // Upload the image to the Firebase Storage bucket
     await global.bucket.upload(imagePath, {
       destination: destination,
@@ -48,51 +52,56 @@ exports.ImagePredict = async (req, res) => {
       expires: "03-01-2500", // Set a far future expiration date
     });
 
-    // Call the gRPC client to predict the image
-    predictImage(imagePath, async (error, response) => {
-      if (error) {
-        console.error("Error predicting image:", error);
-        return res
-          .status(500)
-          .send({ message: "Internal Server Error: Prediction failed" });
-      }
+    // Log the URL to verify it is being generated correctly
+    console.log("Image URL:", url);
 
-      // Store the prediction result in the Firestore 'predict_history' collection
-      const predictHistoryRef = global.db.collection("predict_history").doc();
-      await predictHistoryRef.set({
-        imageUrl: url, // URL of the uploaded image
-        predicted_class: response.predicted_class, // Predicted class of the image
-        waste_type: response.waste_type, // Type of waste
-        probabilities: response.probabilities, // Probabilities for all classes
-        timestamp: new Date(), // Timestamp of the prediction
-        userId: userId, // ID of the user who made the prediction
-      });
+    // Call the FastAPI service to predict the image using the image URL
+    const prediction = await predictImage(url);
 
-      // Add the document ID to the user's 'predictCollection' array in Firestore
-      const userRef = global.db.collection("users").doc(userId);
-      await userRef.update({
-        predictCollection: FieldValue.arrayUnion(predictHistoryRef.id),
-      });
-
-      // Send the prediction response back to the client
-      res.status(200).send({
-        imageUrl: url, // URL of the uploaded image
-        predicted_class: response.predicted_class, // Predicted class of the image
-        waste_type: response.waste_type, // Type of waste
-        probabilities: response.probabilities, // Probabilities for all classes
-      });
+    // Store the prediction result in the Firestore 'predict_history' collection
+    const predictHistoryRef = global.db.collection("predict_history").doc();
+    await predictHistoryRef.set({
+      imageUrl: url, // URL of the uploaded image
+      predicted_class: prediction.predicted_class, // Predicted class of the image
+      waste_type: prediction.waste_type, // Type of waste
+      probabilities: prediction.probabilities, // Probabilities for all classes
+      timestamp: new Date(), // Timestamp of the prediction
+      userId: userId, // ID of the user who made the prediction
     });
+
+    // Add the document ID to the user's 'predictCollection' array in Firestore
+    const userRef = global.db.collection("users").doc(userId);
+    await userRef.update({
+      predictCollection: FieldValue.arrayUnion(predictHistoryRef.id),
+    });
+
+    // Send the prediction response back to the client
+    res.status(200).send({
+      imageUrl: url, // URL of the uploaded image
+      predicted_class: prediction.predicted_class, // Predicted class of the image
+      waste_type: prediction.waste_type, // Type of waste
+      probabilities: prediction.probabilities, // Probabilities for all classes
+    });
+
+    // Temporarily disable file deletion
+    // fs.unlink(imagePath, (err) => {
+    //   if (err) {
+    //     console.error("Error deleting temporary file:", err);
+    //   } else {
+    //     console.log("Temporary file deleted:", imagePath);
+    //   }
+    // });
   } catch (error) {
     console.error("Error processing request:", error);
 
-    // Delete the temporary uploaded file in case of error
-    fs.unlink(imagePath, (err) => {
-      if (err) {
-        console.error("Error deleting temporary file:", err);
-      } else {
-        console.log("Temporary file deleted:", imagePath);
-      }
-    });
+    // Temporarily disable file deletion in case of error
+    // fs.unlink(imagePath, (err) => {
+    //   if (err) {
+    //     console.error("Error deleting temporary file:", err);
+    //   } else {
+    //     console.log("Temporary file deleted:", imagePath);
+    //   }
+    // });
 
     // Check for specific error types and respond accordingly
     if (error.code === "storage/unauthorized") {
@@ -121,6 +130,7 @@ exports.getAllPredictHistory = async (req, res) => {
       id: doc.id,
       ...doc.data(),
     }));
+    console.log("Predict History:", predictHistory);
     res.status(200).send({ predictHistory });
   } catch (error) {
     console.error("Error listing predict history:", error);

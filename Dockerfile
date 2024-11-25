@@ -1,10 +1,10 @@
-# Use a lightweight Node.js base image
-FROM node:18-alpine
+# Use an official Node.js runtime as a parent image
+FROM node:14
 
-# Create and set the working directory
-WORKDIR /usr/src/app
+# Set the working directory
+WORKDIR /app
 
-# Copy package.json and package-lock.json files
+# Copy package.json and package-lock.json
 COPY package*.json ./
 
 # Install dependencies
@@ -13,8 +13,9 @@ RUN npm install
 # Copy the rest of the application code
 COPY . .
 
-# Expose the port your app will run on (Cloud Run automatically assigns a port)
+# Expose the port the app runs on
 EXPOSE 7070
 
-# Run the web service on container startup.
-CMD [ "npm", "start" ]
+
+# Command to run the application
+CMD ["node", "src/app.js"]

@@ -62,8 +62,11 @@ if (process.env.IS_CRON_JOB_SCHEDULED !== "true") {
 
 // Initialize Firebase app with service account credentials
 if (!IS_ON_DEV) {
+  const serviceAccountPath = process.env.SERVICE_ACCOUNT_PATH;
+  const serviceAccount = require(serviceAccountPath);
   console.log("Using default credentials");
   initializeApp({
+    credential: cert(serviceAccount),
     storageBucket: bucketPath,
   });
 

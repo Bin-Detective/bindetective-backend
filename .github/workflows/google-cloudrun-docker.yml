@@ -100,7 +100,7 @@ jobs:
             --min-instances=0
             --max-instances=1
             --set-env-vars FIREBASE_STORAGE_BUCKET=dicoding-submission-440805.firebasestorage.app
-            --set-env-vars ROBIN_GRPC_SERVICE=https://bin-detective-ml-grpc-476908432279.asia-southeast2.run.app
+            --set-env-vars ROBIN_GRPC_SERVICE=bin-detective-ml-grpc-476908432279.asia-southeast2.run.app
             --set-env-vars ROBIN_GRPC_PORT=50051
             --set-env-vars IS_ON_DEV=false
             --set-env-vars IS_CRON_JOB_SCHEDULED=false

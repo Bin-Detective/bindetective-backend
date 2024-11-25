@@ -38,7 +38,7 @@ env:
   SERVICE: 'bin-detective' 
   SERVICE_ACCOUNT: 'bindetective@dicoding-submission-440805.iam.gserviceaccount.com' # Replace with the service account for Cloud Run
   FIREBASE_STORAGE_BUCKET_ENV: 'dicoding-submission-440805.firebasestorage.app'
-  FASTAPI_SERVICE: https://bin-detective-ml-476908432279.asia-southeast2.run.app
+  FASTAPI_SERVICE: 'https://bin-detective-ml-476908432279.asia-southeast2.run.app'
   FASTAPI_PORT: 7976
   IS_ON_DEV: 'false'
   IS_CRON_JOB_SCHEDULED: 'false'

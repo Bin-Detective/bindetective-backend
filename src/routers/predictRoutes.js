@@ -28,6 +28,6 @@ router.use(authenticateToken);
 // Define routes and associate each route with its respective handlers.
 router.post("/", upload.single("image"), handlers.handleImagePredict);
 
-// router.get("/collections", handlers.getAllPredictHistory);
+router.get("/collections", handlers.getAllPredictHistory);
 
 module.exports = router;

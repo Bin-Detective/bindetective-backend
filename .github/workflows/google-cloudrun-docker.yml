@@ -101,6 +101,8 @@ jobs:
             --max-instances=1
             --set-env-vars FIREBASE_STORAGE_BUCKET=dicoding-submission-440805.firebasestorage.app
             --set-env-vars IS_ON_DEV=false
+            --set-env-vars FASTAPI_SERVICE=https://bin-detective-ml-476908432279.asia-southeast2.run.app
+            --set-env-vars FASTAPI_PORT=7976
             --port=7070
           skip_default_labels: true
 

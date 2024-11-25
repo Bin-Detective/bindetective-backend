@@ -1,6 +1,7 @@
 const { predictImage } = require("../middleware/grpcClient");
 const path = require("path");
 const { v4: uuidv4 } = require("uuid");
+const fs = require("fs");
 const { getAuth } = require("firebase-admin/auth");
 const { FieldValue } = require("firebase-admin/firestore");
 

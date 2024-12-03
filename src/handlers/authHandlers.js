@@ -3,13 +3,10 @@
 // Firestore database instance is initialized globally in app.js
 
 // Handler to create a new user
-// Expected request body: { "userId": "string", "userName": "string", "dateOfBirth": "string" }
-// Handler to create a new user
-// Expected request body: { "userName": "string", "dateOfBirth": "string" }
-
+// Expected request body: { "userName": "string", "dateOfBirth": "string", "profilePictureUrl": "string" }
 exports.createUser = async (req, res) => {
   try {
-    const { userName, dateOfBirth } = req.body;
+    const { userName, dateOfBirth, profilePictureUrl } = req.body;
     const userId = req.uid; // Use the UID from the authenticated request
 
     // Validate required fields
@@ -18,11 +15,15 @@ exports.createUser = async (req, res) => {
     }
 
     // Add new user document to 'users' collection in Firestore
-    await db.collection("users").doc(userId).set({
-      userName,
-      dateOfBirth,
-      predictCollection: [],
-    });
+    await db
+      .collection("users")
+      .doc(userId)
+      .set({
+        userName,
+        dateOfBirth,
+        profilePictureUrl: profilePictureUrl || null, // Include profile picture URL if provided
+        predictCollection: [],
+      });
 
     res.status(201).send({ message: "User created successfully" }); // Send success response
   } catch (error) {
@@ -52,11 +53,11 @@ exports.getUserById = async (req, res) => {
 
 // Handler to update a user by ID
 // URL parameter: :userId - ID of the user to update
-// Expected request body: { "userName": "string", "dateOfBirth": "string" }
+// Expected request body: { "userName": "string", "dateOfBirth": "string", "profilePictureUrl": "string" }
 exports.updateUserById = async (req, res) => {
   try {
     const userId = req.params.userId; // Extract user ID from URL
-    const { userName, dateOfBirth } = req.body; // Extract fields to update from request body
+    const { userName, dateOfBirth, profilePictureUrl } = req.body; // Extract fields to update from request body
 
     // Update specified fields in the user document
     await db
@@ -65,6 +66,7 @@ exports.updateUserById = async (req, res) => {
       .update({
         ...(userName && { userName }), // Only update if userName is provided
         ...(dateOfBirth && { dateOfBirth }), // Only update if dateOfBirth is provided
+        ...(profilePictureUrl && { profilePictureUrl }), // Only update if profilePictureUrl is provided
       });
 
     res.status(200).send({ message: "User updated successfully" }); // Send success response
@@ -101,7 +103,8 @@ exports.getAllUsers = async (req, res) => {
     const users = usersSnapshot.docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),
-    })); // Format each document to include ID
+      profilePictureUrl: doc.data().profilePictureUrl || null, // Include profile picture URL if available
+    })); // Format each document to include ID and profile picture URL
 
     res.status(200).send(users); // Send array of user objects as response
   } catch (error) {

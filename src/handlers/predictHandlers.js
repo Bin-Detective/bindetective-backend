@@ -7,14 +7,18 @@ const { predictImage } = require("../middleware/restClient");
 
 // Handler to predict image
 exports.handleImagePredict = async (req, res) => {
+  console.log("Starting image prediction...");
+
   // Check if an image file is provided
   if (!req.file) {
+    console.log("No image file provided");
     return res.status(400).send({ message: "No image file provided" });
   }
 
   // Extract the user's token from the Authorization header
   const idToken = req.headers.authorization?.split("Bearer ")[1];
   if (!idToken) {
+    console.log("Unauthorized: No token provided");
     return res.status(401).send({ message: "Unauthorized: No token provided" });
   }
 
@@ -23,7 +27,9 @@ exports.handleImagePredict = async (req, res) => {
     // Verify the user's token and extract the user ID
     const decodedToken = await getAuth().verifyIdToken(idToken);
     userId = decodedToken.uid;
+    console.log("User authenticated successfully:", userId);
   } catch (error) {
+    console.log("Unauthorized: Invalid token");
     return res.status(401).send({ message: "Unauthorized: Invalid token" });
   }
 
@@ -33,6 +39,8 @@ exports.handleImagePredict = async (req, res) => {
   const tempDestination = `tempImages/${tempFileName}`;
 
   try {
+    console.log("Uploading image to temporary folder...");
+
     // Upload the image to the temporary folder
     await global.bucket.upload(imagePath, {
       destination: tempDestination,
@@ -41,12 +49,16 @@ exports.handleImagePredict = async (req, res) => {
       },
     });
 
+    console.log("Image uploaded to temporary folder:", tempDestination);
+
     // Get the public URL of the uploaded image from the temporary folder
     const tempFile = global.bucket.file(tempDestination);
     const [tempUrl] = await tempFile.getSignedUrl({
       action: "read",
       expires: "03-01-2500", // Set a far future expiration date
     });
+
+    console.log("Temporary URL generated:", tempUrl);
 
     // Call the FastAPI service to predict the image using the temporary URL
     const prediction = await predictImage(tempUrl);
@@ -55,6 +67,8 @@ exports.handleImagePredict = async (req, res) => {
     if (!prediction || !prediction.predicted_class) {
       throw new Error("Invalid prediction response");
     }
+
+    console.log("Prediction successful:", prediction);
 
     // Define the permanent destination for the image
     const permanentFileName = `${uuidv4()}${path.extname(
@@ -65,12 +79,16 @@ exports.handleImagePredict = async (req, res) => {
     // Move the image to the permanent folder
     await tempFile.move(permanentDestination);
 
+    console.log("Image moved to permanent folder:", permanentDestination);
+
     // Get the public URL of the uploaded image from the permanent folder
     const permanentFile = global.bucket.file(permanentDestination);
     const [permanentUrl] = await permanentFile.getSignedUrl({
       action: "read",
       expires: "03-01-2500", // Set a far future expiration date
     });
+
+    console.log("Permanent URL generated:", permanentUrl);
 
     // Store the prediction result in the Firestore 'predict_history' collection
     const predictHistoryRef = global.db.collection("predict_history").doc();
@@ -83,11 +101,15 @@ exports.handleImagePredict = async (req, res) => {
       userId: userId, // ID of the user who made the prediction
     });
 
+    console.log("Prediction result stored in Firestore:", predictHistoryRef.id);
+
     // Add the document ID to the user's 'predictCollection' array in Firestore
     const userRef = global.db.collection("users").doc(userId);
     await userRef.update({
       predictCollection: FieldValue.arrayUnion(predictHistoryRef.id),
     });
+
+    console.log("Prediction result added to user's predictCollection:", userId);
 
     // Send the prediction response back to the client
     res.status(200).send({
@@ -97,25 +119,24 @@ exports.handleImagePredict = async (req, res) => {
       probabilities: prediction.probabilities, // Probabilities for all classes
     });
 
+    console.log("Prediction response sent to client");
+
     // Delete the temporary file after sending the response
     fs.unlink(imagePath, (err) => {
       if (err) {
         console.error("Error deleting temporary file:", err);
+      } else {
+        console.log("Temporary file deleted:", imagePath);
       }
     });
   } catch (error) {
+    console.error("Error during image prediction:", error);
+
     // Delete the image from the temporary folder if the prediction call fails
     const tempFile = global.bucket.file(tempDestination);
     tempFile.delete().catch((err) => {
       console.error("Error deleting file from temporary folder:", err);
     });
-
-    // Temporarily disable file deletion in case of error
-    // fs.unlink(imagePath, (err) => {
-    //   if (err) {
-    //     console.error("Error deleting temporary file:", err);
-    //   }
-    // });
 
     // Check for specific error types and respond accordingly
     if (error.code === "storage/unauthorized") {
@@ -139,13 +160,16 @@ exports.handleImagePredict = async (req, res) => {
 // Handler to list all documents in the 'predict_history' collection
 exports.getAllPredictHistory = async (req, res) => {
   try {
+    console.log("Fetching all prediction history...");
     const snapshot = await global.db.collection("predict_history").get();
     const predictHistory = snapshot.docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),
     }));
+    console.log("Prediction history fetched successfully");
     res.status(200).send({ predictHistory });
   } catch (error) {
+    console.error("Error fetching prediction history:", error);
     res.status(500).send({ message: "Internal Server Error" });
   }
 };

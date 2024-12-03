@@ -52,8 +52,11 @@ const cleanUploadsDir = () => {
 
 // Initialize Firebase app with service account credentials
 if (!IS_ON_DEV) {
-  console.log("Using Service Account Credentials");
+  const serviceAccountPath = process.env.SERVICE_ACCOUNT_PATH;
+  const serviceAccount = require(serviceAccountPath);
+  console.log("Using Provided Credentials...");
   initializeApp({
+    credential: cert(serviceAccount),
     storageBucket: bucketPath,
   });
 

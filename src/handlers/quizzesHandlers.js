@@ -30,6 +30,7 @@ const { FieldValue } = require("firebase-admin/firestore"); // Import FieldValue
 // }
 exports.createQuiz = async (req, res) => {
   try {
+    console.log("Creating a new quiz...");
     const { title, description, questions } = req.body; // Extract title, description, and questions from request body
     const quizId = uuidv4(); // Generate a unique ID for the quiz
 
@@ -41,6 +42,7 @@ exports.createQuiz = async (req, res) => {
       createdAt: new Date(), // Add a timestamp for when the quiz was created
     });
 
+    console.log("Quiz created successfully with ID:", quizId);
     res.status(201).send({ message: "Quiz created successfully", quizId }); // Send success response with quiz ID
   } catch (error) {
     console.error("Error creating quiz:", error); // Log error to console
@@ -64,9 +66,11 @@ exports.createQuiz = async (req, res) => {
 // ]
 exports.getAllQuizzes = async (req, res) => {
   try {
+    console.log("Fetching all quizzes...");
     const quizzesSnapshot = await db.collection("quizzes").get(); // Get all quiz documents from Firestore
 
     if (quizzesSnapshot.empty) {
+      console.log("No quizzes found");
       return res.status(404).send({ message: "No quizzes found" }); // Send 404 response if no quizzes are found
     }
 
@@ -77,6 +81,7 @@ exports.getAllQuizzes = async (req, res) => {
       description: doc.data().description,
     }));
 
+    console.log("Quizzes fetched successfully");
     res.status(200).send(quizzes); // Send array of quiz objects as response
   } catch (error) {
     console.error("Error fetching quizzes:", error); // Log error to console
@@ -105,13 +110,16 @@ exports.getAllQuizzes = async (req, res) => {
 // }
 exports.getQuizById = async (req, res) => {
   try {
+    console.log("Fetching quiz by ID...");
     const quizId = req.params.quizId; // Extract quiz ID from URL parameters
     const quizDoc = await db.collection("quizzes").doc(quizId).get(); // Get quiz document from Firestore
 
     if (!quizDoc.exists) {
+      console.log("Quiz not found with ID:", quizId);
       return res.status(404).send({ message: "Quiz not found" }); // Send 404 response if quiz is not found
     }
 
+    console.log("Quiz fetched successfully with ID:", quizId);
     res.status(200).send(quizDoc.data()); // Send quiz data as response
   } catch (error) {
     console.error("Error fetching quiz:", error); // Log error to console
@@ -135,6 +143,7 @@ exports.getQuizById = async (req, res) => {
 // }
 exports.submitQuizAnswers = async (req, res) => {
   try {
+    console.log("Submitting quiz answers...");
     const quizId = req.params.quizId; // Extract quiz ID from URL parameters
     const { userId, answers } = req.body; // Extract user ID and answers from request body
 
@@ -160,6 +169,7 @@ exports.submitQuizAnswers = async (req, res) => {
       }),
     });
 
+    console.log("Quiz answers submitted successfully for user:", userId);
     res
       .status(200)
       .send({ message: "Quiz answers submitted successfully", score }); // Send success response with score
@@ -172,6 +182,7 @@ exports.submitQuizAnswers = async (req, res) => {
 // Helper function to calculate the score (implementation depends on your quiz structure)
 async function calculateScore(answers, quizId) {
   let score = 0;
+  console.log("Calculating score for quiz ID:", quizId);
   // Fetch the quiz questions from Firestore
   const quizDoc = await db.collection("quizzes").doc(quizId).get();
   const questions = quizDoc.data().questions;
@@ -187,5 +198,6 @@ async function calculateScore(answers, quizId) {
     }
   });
 
+  console.log("Score calculated:", score);
   return score; // Return the calculated score
 }

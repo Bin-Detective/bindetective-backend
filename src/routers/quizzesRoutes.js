@@ -85,7 +85,5 @@ Request :
 */
 router.post("/:quizId/submit", handlers.submitQuizAnswers);
 
-router.get("/leaderboard", handlers.getQuizLeaderboard);
-
 // Export the router object so it can be used in app.js
 module.exports = router;

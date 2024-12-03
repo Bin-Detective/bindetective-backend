@@ -30,6 +30,7 @@ All endpoints require an authorization token in the request header.
 - [Delete User By ID](#4-delete-user-by-id)
 - [Get All Users](#5-get-all-users)
 - [Get User Predict Collection](#6-get-user-predict-collection)
+- [Get User Quiz Result](#7-get-user-quiz-result)
 
 ### 1. Create User
 
@@ -276,6 +277,48 @@ All endpoints require an authorization token in the request header.
 
   - **500 Internal Server Error**
 
+    ```json
+    {
+      "message": "Internal Server Error"
+    }
+    ```
+
+### 7. Get User Quiz Results
+
+- **URL:** `/users/:userId/results`
+- **Method:** `GET`
+- **Request Header:** `Authorization: Bearer <idToken>`
+- **URL Parameter:**
+  - `userId`: The unique ID of the user whose quiz results are to be retrieved.
+- **Responses:**
+  - **200 OK:** Returns an array of result objects.
+    ```json
+    [
+      {
+        "quizId": "quiz1",
+        "score": 80,
+        "completedAt": "2024-12-03T12:00:00Z"
+      },
+      {
+        "quizId": "quiz2",
+        "score": 90,
+        "completedAt": "2024-12-04T14:00:00Z"
+      }
+    ]
+    ```
+  - **401 Unauthorized:** Authorization token missing or invalid.
+    ```json
+    {
+      "error": "Authorization token missing" // or "Unauthorized"
+    }
+    ```
+  - **404 Not Found:** User not found.
+    ```json
+    {
+      "message": "User not found"
+    }
+    ```
+  - **500 Internal Server Error:** An error occurred while fetching the user's results.
     ```json
     {
       "message": "Internal Server Error"

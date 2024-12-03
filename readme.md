@@ -229,7 +229,7 @@ All endpoints require an authorization token in the request header.
 
   - **500 Internal Server Error**: An error occurred while fetching the users.
 
-  ### 6. Get All User Predict Collection
+### 6. Get All User Predict Collection
 
 - URL : `/users/:userId/collections`
 - Method : `GET`

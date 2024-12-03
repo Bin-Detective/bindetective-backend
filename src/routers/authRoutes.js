@@ -31,6 +31,9 @@ router.delete("/:userId", handlers.deleteUserById);
 // Define the route for getting user's predictCollection items
 router.get("/:userId/collections", handlers.getUserPredictCollection);
 
+// Route to get user quiz results
+router.get("/:userId/results", handlers.getUserResults);
+
 // Route to get all users
 // GET /users - Retrieves a list of all users in the database
 router.get("/", handlers.getAllUsers);

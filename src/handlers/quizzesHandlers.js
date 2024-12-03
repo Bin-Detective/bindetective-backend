@@ -5,29 +5,6 @@ const { v4: uuidv4 } = require("uuid");
 const { FieldValue } = require("firebase-admin/firestore"); // Import FieldValue from firebase-admin/firestore
 
 // Handler to create a new quiz
-// Request:
-// {
-//   "title": "General Knowledge Quiz",
-//   "description": "A fun quiz to test your knowledge.",
-//   "questions": [
-//     {
-//       "questionId": "q1",
-//       "text": "What is the capital of France?",
-//       "type": "multiple-choice",
-//       "options": [
-//         { "id": "o1", "text": "Paris", "isCorrect": true },
-//         { "id": "o2", "text": "London", "isCorrect": false },
-//         { "id": "o3", "text": "Berlin", "isCorrect": false },
-//         { "id": "o4", "text": "Madrid", "isCorrect": false }
-//       ]
-//     }
-//   ]
-// }
-// Response:
-// {
-//   "message": "Quiz created successfully",
-//   "quizId": "generated-quiz-id"
-// }
 exports.createQuiz = async (req, res) => {
   try {
     console.log("Creating a new quiz...");
@@ -51,19 +28,6 @@ exports.createQuiz = async (req, res) => {
 };
 
 // Handler to fetch all quizzes
-// Response:
-// [
-//   {
-//     "quizId": "quiz1",
-//     "title": "General Knowledge Quiz",
-//     "description": "A fun quiz to test your knowledge."
-//   },
-//   {
-//     "quizId": "quiz2",
-//     "title": "Science Trivia",
-//     "description": "Test your science knowledge!"
-//   }
-// ]
 exports.getAllQuizzes = async (req, res) => {
   try {
     console.log("Fetching all quizzes...");
@@ -90,24 +54,6 @@ exports.getAllQuizzes = async (req, res) => {
 };
 
 // Handler to fetch a specific quiz by ID
-// Response:
-// {
-//   "title": "General Knowledge Quiz",
-//   "description": "A fun quiz to test your knowledge.",
-//   "questions": [
-//     {
-//       "questionId": "q1",
-//       "text": "What is the capital of France?",
-//       "type": "multiple-choice",
-//       "options": [
-//         { "id": "o1", "text": "Paris", "isCorrect": true },
-//         { "id": "o2", "text": "London", "isCorrect": false },
-//         { "id": "o3", "text": "Berlin", "isCorrect": false },
-//         { "id": "o4", "text": "Madrid", "isCorrect": false }
-//       ]
-//     }
-//   ]
-// }
 exports.getQuizById = async (req, res) => {
   try {
     console.log("Fetching quiz by ID...");
@@ -128,19 +74,6 @@ exports.getQuizById = async (req, res) => {
 };
 
 // Handler to submit quiz answers
-// Request:
-// {
-//   "userId": "user123",
-//   "answers": [
-//     { "questionId": "q1", "selectedOptionId": "o1" },
-//     { "questionId": "q2", "selectedOptionId": "o2" }
-//   ]
-// }
-// Response:
-// {
-//   "message": "Quiz answers submitted successfully",
-//   "score": 80
-// }
 exports.submitQuizAnswers = async (req, res) => {
   try {
     console.log("Submitting quiz answers...");

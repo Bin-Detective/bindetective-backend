@@ -6,6 +6,7 @@ const bodyParser = require("body-parser"); // Middleware to parse incoming reque
 const authRoutes = require("./routers/authRoutes"); // Custom routes for handling user-related requests
 const contentRoutes = require("./routers/contentRoutes"); // Custom routes for handling content-related requests
 const predictRoutes = require("./routers/predictRoutes"); // Routes for handling the predict request to robin
+const quizzesRoutes = require("./routers/quizzesRoutes"); // Routes for handling the quiz questions
 const cron = require("node-cron"); // Package for scheduling tasks
 const fs = require("fs");
 const dotenv = require("dotenv");
@@ -94,6 +95,7 @@ app.use(bodyParser.json());
 app.use("/users", authRoutes);
 app.use("/articles", contentRoutes);
 app.use("/predict", predictRoutes);
+app.use("/quizzes", quizzesRoutes);
 
 // Start the server
 app.listen(PORT, () => {

@@ -3,6 +3,7 @@
 - [User Management](#user-management)
 - [Article Management](#article-management)
 - [ML Waste Image Prediction](#ml-waste-image-prediction)
+- [Quizz Management](#quizz-management)
 
 ## User Management
 
@@ -29,6 +30,7 @@ All endpoints require an authorization token in the request header.
 - [Delete User By ID](#4-delete-user-by-id)
 - [Get All Users](#5-get-all-users)
 - [Get User Predict Collection](#6-get-user-predict-collection)
+- [Get User Quiz Result](#7-get-user-quiz-result)
 
 ### 1. Create User
 
@@ -41,7 +43,8 @@ All endpoints require an authorization token in the request header.
 ```json
 {
   "userName": "string", // required, name of the user
-  "dateOfBirth": "string" // optional, date of birth in the format YYYY-MM-DD
+  "dateOfBirth": "string", // date of birth in the format YYYY-MM-DD
+  "profilePictureUrl": "string" // format in url
 }
 ```
 
@@ -87,7 +90,8 @@ All endpoints require an authorization token in the request header.
   ```json
   {
     "userName": "string",
-    "dateOfBirth": "string"
+    "dateOfBirth": "string",
+    "profilePictureUrl": "string"
   }
   ```
 
@@ -120,8 +124,9 @@ All endpoints require an authorization token in the request header.
 
 ```json
 {
-  "userName": "string", // optional, name of the user
-  "dateOfBirth": "string" // optional, date of birth in the format YYYY-MM-DD
+  "userName": "string", // name of the user
+  "dateOfBirth": "string", // date of birth in the format YYYY-MM-DD
+  "profilePictureUrl": "string" // format in url
 }
 ```
 
@@ -203,12 +208,14 @@ All endpoints require an authorization token in the request header.
     {
       "id": "string",          // userId from Firestore document ID
       "userName": "string",
-      "dateOfBirth": "string"
+      "dateOfBirth": "string",
+      "profilePictureUrl": "string"
     },
     {
       "id": "string",
       "userName": "string",
-      "dateOfBirth": "string"
+      "dateOfBirth": "string",
+      "profilePictureUrl": "string"
     },
     ...
   ]
@@ -224,7 +231,7 @@ All endpoints require an authorization token in the request header.
 
   - **500 Internal Server Error**: An error occurred while fetching the users.
 
-  ### 6. Get All User Predict Collection
+### 6. Get All User Predict Collection
 
 - URL : `/users/:userId/collections`
 - Method : `GET`
@@ -270,6 +277,48 @@ All endpoints require an authorization token in the request header.
 
   - **500 Internal Server Error**
 
+    ```json
+    {
+      "message": "Internal Server Error"
+    }
+    ```
+
+### 7. Get User Quiz Results
+
+- **URL:** `/users/:userId/results`
+- **Method:** `GET`
+- **Request Header:** `Authorization: Bearer <idToken>`
+- **URL Parameter:**
+  - `userId`: The unique ID of the user whose quiz results are to be retrieved.
+- **Responses:**
+  - **200 OK:** Returns an array of result objects.
+    ```json
+    [
+      {
+        "quizId": "quiz1",
+        "score": 80,
+        "completedAt": "2024-12-03T12:00:00Z"
+      },
+      {
+        "quizId": "quiz2",
+        "score": 90,
+        "completedAt": "2024-12-04T14:00:00Z"
+      }
+    ]
+    ```
+  - **401 Unauthorized:** Authorization token missing or invalid.
+    ```json
+    {
+      "error": "Authorization token missing" // or "Unauthorized"
+    }
+    ```
+  - **404 Not Found:** User not found.
+    ```json
+    {
+      "message": "User not found"
+    }
+    ```
+  - **500 Internal Server Error:** An error occurred while fetching the user's results.
     ```json
     {
       "message": "Internal Server Error"
@@ -550,3 +599,220 @@ This API allows for image prediction and managing prediction history.
       "message": "Internal Server Error"
     }
     ```
+
+## Quizz Management
+
+### 1. Create a New Quiz
+
+- **URL:** `/quizzes`
+- **Method:** `POST`
+- **Request Header:** `Authorization: Bearer <idToken>`
+- **Request Body:**
+
+  ```json
+  {
+    "title": "General Knowledge Quiz",
+    "description": "A fun quiz to test your knowledge.",
+    "questions": [
+      {
+        "questionId": "q1",
+        "text": "What is the capital of France?",
+        "type": "multiple-choice",
+        "options": [
+          { "id": "o1", "text": "Paris", "isCorrect": true },
+          { "id": "o2", "text": "London", "isCorrect": false },
+          { "id": "o3", "text": "Berlin", "isCorrect": false },
+          { "id": "o4", "text": "Madrid", "isCorrect": false }
+        ]
+      }
+    ]
+  }
+  ```
+
+- Response :
+
+  - `201 Created`: Quiz created successfully.
+
+    ```json
+    {
+      "message": "Quiz created successfully",
+      "quizId": "generated-quiz-id"
+    }
+    ```
+
+  - `401 Unauthorized`
+
+    ```json
+    {
+      "message": "Unauthorized: No token provided"
+    }
+    ```
+
+  - `505 Internal Server Error`
+
+### 2. Fetch All Quizzes
+
+- **URL:** `/quizzes`
+- **Method:** `GET`
+- **Request Header:** `Authorization: Bearer <idToken>`
+- **Request Body:**
+
+  ```json
+  [
+    {
+      "quizId": "quiz1",
+      "title": "General Knowledge Quiz",
+      "description": "A fun quiz to test your knowledge."
+    },
+    {
+      "quizId": "quiz2",
+      "title": "Science Trivia",
+      "description": "Test your science knowledge!"
+    }
+  ]
+  ```
+
+- Response :
+
+  - `200 OK`: Returns an array of quiz objects.
+
+    ```json
+    [
+      {
+        "quizId": "quiz1",
+        "title": "General Knowledge Quiz",
+        "description": "A fun quiz to test your knowledge."
+      },
+      {
+        "quizId": "quiz2",
+        "title": "Science Trivia",
+        "description": "Test your science knowledge!"
+      }
+    ]
+    ```
+
+  - `401 Unauthorized`
+
+    ```json
+    {
+      "message": "Unauthorized: No token provided"
+    }
+    ```
+
+  - `505 Internal Server Error`
+
+### 3. Fetch Specific Quiz
+
+- **URL:** `/quizzes/:quizId`
+- **Method:** `GET`
+- **Request Header:** `Authorization: Bearer <idToken>`
+
+- Response :
+
+  - `200 OK`: Returns an array of quiz objects.
+
+    ```json
+    {
+      "title": "General Knowledge Quiz",
+      "description": "A fun quiz to test your knowledge.",
+      "questions": [
+        {
+          "questionId": "q1",
+          "text": "What is the capital of France?",
+          "type": "multiple-choice",
+          "options": [
+            { "id": "o1", "text": "Paris", "isCorrect": true },
+            { "id": "o2", "text": "London", "isCorrect": false },
+            { "id": "o3", "text": "Berlin", "isCorrect": false },
+            { "id": "o4", "text": "Madrid", "isCorrect": false }
+          ]
+        }
+      ]
+    }
+    ```
+
+  - `401 Unauthorized`
+
+    ```json
+    {
+      "message": "Unauthorized: No token provided"
+    }
+    ```
+
+  - `404 Not Found`
+
+    ```json
+    {
+      "message": "Quiz not found"
+    }
+    ```
+
+  - `505 Internal Server Error`
+
+### 4. Submit Quiz Answers
+
+- **URL:** `/quizzes/:quizId/submit`
+- **Method:** `POST`
+- **Request Header:** `Authorization: Bearer <idToken>`
+- **Request Body:**
+
+  ```json
+  {
+    "userId": "user123",
+    "answers": [
+      { "questionId": "q1", "selectedOptionId": "o1" },
+      { "questionId": "q2", "selectedOptionId": "o2" }
+    ]
+  }
+  ```
+
+- Response :
+
+  - `200 OK`: Returns an array of quiz objects.
+
+    ```json
+    {
+      "message": "Quiz answers submitted successfully",
+      "score": 80
+    }
+    ```
+
+  - `401 Unauthorized`
+
+    ```json
+    {
+      "message": "Unauthorized: No token provided"
+    }
+    ```
+
+  - `505 Internal Server Error`
+
+### 5. Fetch a User’s Results
+
+- **URL:** `/quizzes/:quizId/result`
+- **Method:** `GET`
+- **Request Header:** `Authorization: Bearer <idToken>`
+
+- Response :
+
+  - `200 OK`: Returns an array of quiz objects.
+
+    ```json
+    [
+      {
+        "quizId": "quiz1",
+        "score": 80,
+        "completedAt": "2024-12-03T12:00:00Z"
+      }
+    ]
+    ```
+
+  - `401 Unauthorized`
+
+    ```json
+    {
+      "message": "Unauthorized: No token provided"
+    }
+    ```
+
+  - `505 Internal Server Error`

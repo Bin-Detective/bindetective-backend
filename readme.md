@@ -41,7 +41,8 @@ All endpoints require an authorization token in the request header.
 ```json
 {
   "userName": "string", // required, name of the user
-  "dateOfBirth": "string" // optional, date of birth in the format YYYY-MM-DD
+  "dateOfBirth": "string", // date of birth in the format YYYY-MM-DD
+  "profilePictureUrl": "string" // format in url
 }
 ```
 
@@ -87,7 +88,8 @@ All endpoints require an authorization token in the request header.
   ```json
   {
     "userName": "string",
-    "dateOfBirth": "string"
+    "dateOfBirth": "string",
+    "profilePictureUrl": "string"
   }
   ```
 
@@ -120,8 +122,9 @@ All endpoints require an authorization token in the request header.
 
 ```json
 {
-  "userName": "string", // optional, name of the user
-  "dateOfBirth": "string" // optional, date of birth in the format YYYY-MM-DD
+  "userName": "string", // name of the user
+  "dateOfBirth": "string", // date of birth in the format YYYY-MM-DD
+  "profilePictureUrl": "string" // format in url
 }
 ```
 
@@ -203,12 +206,14 @@ All endpoints require an authorization token in the request header.
     {
       "id": "string",          // userId from Firestore document ID
       "userName": "string",
-      "dateOfBirth": "string"
+      "dateOfBirth": "string",
+      "profilePictureUrl": "string"
     },
     {
       "id": "string",
       "userName": "string",
-      "dateOfBirth": "string"
+      "dateOfBirth": "string",
+      "profilePictureUrl": "string"
     },
     ...
   ]

@@ -49,17 +49,6 @@ const cleanUploadsDir = () => {
   });
 };
 
-// Check if the cron job has already been scheduled
-if (process.env.IS_CRON_JOB_SCHEDULED !== "true") {
-  cron.schedule("0 0 */7 * *", () => {
-    console.log("Running scheduled task to clean uploads directory...");
-    cleanUploadsDir();
-  });
-
-  // Update the environment variable to indicate that the cron job has been scheduled
-  process.env.IS_CRON_JOB_SCHEDULED = "true";
-}
-
 // Initialize Firebase app with service account credentials
 if (!IS_ON_DEV) {
   console.log("Using default credentials");

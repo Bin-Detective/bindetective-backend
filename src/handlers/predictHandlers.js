@@ -24,44 +24,58 @@ exports.handleImagePredict = async (req, res) => {
     const decodedToken = await getAuth().verifyIdToken(idToken);
     userId = decodedToken.uid;
   } catch (error) {
-    console.error("Error verifying token:", error);
     return res.status(401).send({ message: "Unauthorized: Invalid token" });
   }
 
   // Define the path and filename for the uploaded image
   const imagePath = req.file.path;
-  const fileName = `${uuidv4()}${path.extname(req.file.originalname)}`;
-  const destination = `predictedUploads/${fileName}`;
+  const tempFileName = `${uuidv4()}${path.extname(req.file.originalname)}`;
+  const tempDestination = `tempImages/${tempFileName}`;
 
   try {
-    // Log the image path to verify it is being stored correctly
-    console.log("Image path:", imagePath);
-
-    // Upload the image to the Firebase Storage bucket
+    // Upload the image to the temporary folder
     await global.bucket.upload(imagePath, {
-      destination: destination,
+      destination: tempDestination,
       metadata: {
         contentType: req.file.mimetype,
       },
     });
 
-    // Get the public URL of the uploaded image
-    const file = global.bucket.file(destination);
-    const [url] = await file.getSignedUrl({
+    // Get the public URL of the uploaded image from the temporary folder
+    const tempFile = global.bucket.file(tempDestination);
+    const [tempUrl] = await tempFile.getSignedUrl({
       action: "read",
       expires: "03-01-2500", // Set a far future expiration date
     });
 
-    // Log the URL to verify it is being generated correctly
-    console.log("Image URL:", url);
+    // Call the FastAPI service to predict the image using the temporary URL
+    const prediction = await predictImage(tempUrl);
 
-    // Call the FastAPI service to predict the image using the image URL
-    const prediction = await predictImage(url);
+    // Check if the prediction response is valid
+    if (!prediction || !prediction.predicted_class) {
+      throw new Error("Invalid prediction response");
+    }
+
+    // Define the permanent destination for the image
+    const permanentFileName = `${uuidv4()}${path.extname(
+      req.file.originalname
+    )}`;
+    const permanentDestination = `predictedUploads/${permanentFileName}`;
+
+    // Move the image to the permanent folder
+    await tempFile.move(permanentDestination);
+
+    // Get the public URL of the uploaded image from the permanent folder
+    const permanentFile = global.bucket.file(permanentDestination);
+    const [permanentUrl] = await permanentFile.getSignedUrl({
+      action: "read",
+      expires: "03-01-2500", // Set a far future expiration date
+    });
 
     // Store the prediction result in the Firestore 'predict_history' collection
     const predictHistoryRef = global.db.collection("predict_history").doc();
     await predictHistoryRef.set({
-      imageUrl: url, // URL of the uploaded image
+      imageUrl: permanentUrl, // URL of the uploaded image
       predicted_class: prediction.predicted_class, // Predicted class of the image
       waste_type: prediction.waste_type, // Type of waste
       probabilities: prediction.probabilities, // Probabilities for all classes
@@ -77,28 +91,29 @@ exports.handleImagePredict = async (req, res) => {
 
     // Send the prediction response back to the client
     res.status(200).send({
-      imageUrl: url, // URL of the uploaded image
+      imageUrl: permanentUrl, // URL of the uploaded image
       predicted_class: prediction.predicted_class, // Predicted class of the image
       waste_type: prediction.waste_type, // Type of waste
       probabilities: prediction.probabilities, // Probabilities for all classes
     });
 
+    // Delete the temporary file after sending the response
     fs.unlink(imagePath, (err) => {
       if (err) {
         console.error("Error deleting temporary file:", err);
-      } else {
-        console.log("Temporary file deleted:", imagePath);
       }
     });
   } catch (error) {
-    console.error("Error processing request:", error);
+    // Delete the image from the temporary folder if the prediction call fails
+    const tempFile = global.bucket.file(tempDestination);
+    tempFile.delete().catch((err) => {
+      console.error("Error deleting file from temporary folder:", err);
+    });
 
     // Temporarily disable file deletion in case of error
     // fs.unlink(imagePath, (err) => {
     //   if (err) {
     //     console.error("Error deleting temporary file:", err);
-    //   } else {
-    //     console.log("Temporary file deleted:", imagePath);
     //   }
     // });
 
@@ -129,10 +144,8 @@ exports.getAllPredictHistory = async (req, res) => {
       id: doc.id,
       ...doc.data(),
     }));
-    console.log("Predict History:", predictHistory);
     res.status(200).send({ predictHistory });
   } catch (error) {
-    console.error("Error listing predict history:", error);
     res.status(500).send({ message: "Internal Server Error" });
   }
 };

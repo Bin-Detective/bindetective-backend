@@ -85,13 +85,6 @@ Request :
 */
 router.post("/:quizId/submit", handlers.submitQuizAnswers);
 
-/* Fetch leaderboard for a quiz
-Response :
-[
-  { "userId": "user123", "score": 80, "completedAt": "2024-12-03T12:00:00Z" },
-  { "userId": "user456", "score": 70, "completedAt": "2024-12-02T15:30:00Z" }
-]
-*/
 router.get("/leaderboard", handlers.getQuizLeaderboard);
 
 // Export the router object so it can be used in app.js

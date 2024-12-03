@@ -2,6 +2,7 @@
 
 // Firestore database instance is initialized globally in app.js
 const { v4: uuidv4 } = require("uuid");
+const { FieldValue } = require("firebase-admin/firestore"); // Import FieldValue from firebase-admin/firestore
 
 // Handler to create a new quiz
 // Request:
@@ -149,6 +150,16 @@ exports.submitQuizAnswers = async (req, res) => {
       submittedAt: new Date(), // Add a timestamp for when the answers were submitted
     });
 
+    // Update the user's document to add the quiz history to the 'quizzesTaken' field
+    const userRef = db.collection("users").doc(userId);
+    await userRef.update({
+      quizzesTaken: FieldValue.arrayUnion({
+        quizId,
+        score,
+        completedAt: new Date(), // Add a timestamp for when the quiz was completed
+      }),
+    });
+
     res
       .status(200)
       .send({ message: "Quiz answers submitted successfully", score }); // Send success response with score
@@ -158,28 +169,33 @@ exports.submitQuizAnswers = async (req, res) => {
   }
 };
 
-// Handler to fetch leaderboard for a quiz
+// Handler to fetch leaderboard
 exports.getQuizLeaderboard = async (req, res) => {
   try {
-    // Fetch all results from the 'results' collection
-    const resultsSnapshot = await db.collection("results").get();
+    // Fetch all user documents from the 'users' collection
+    const usersSnapshot = await db.collection("users").get();
 
-    if (resultsSnapshot.empty) {
-      return res.status(404).send({ message: "No results found" }); // Send 404 response if no results are found
+    if (usersSnapshot.empty) {
+      return res.status(404).send({ message: "No users found" }); // Send 404 response if no users are found
     }
 
-    // Aggregate scores by userId
+    // Aggregate scores by userId from the 'quizzesTaken' field
     const userScores = {};
-    resultsSnapshot.docs.forEach((doc) => {
+    usersSnapshot.docs.forEach((doc) => {
       const data = doc.data();
-      const { userId, score } = data;
+      const { quizzesTaken } = data;
 
-      if (!userScores[userId]) {
-        userScores[userId] = { totalScore: 0, quizzesTaken: 0 };
+      if (quizzesTaken && quizzesTaken.length > 0) {
+        const userId = doc.id;
+        if (!userScores[userId]) {
+          userScores[userId] = { totalScore: 0, quizzesTaken: 0 };
+        }
+
+        quizzesTaken.forEach((quiz) => {
+          userScores[userId].totalScore += quiz.score;
+          userScores[userId].quizzesTaken += 1;
+        });
       }
-
-      userScores[userId].totalScore += score;
-      userScores[userId].quizzesTaken += 1;
     });
 
     // Convert the aggregated scores to an array and sort by totalScore in descending order

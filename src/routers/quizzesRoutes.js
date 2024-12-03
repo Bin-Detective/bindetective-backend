@@ -32,7 +32,7 @@ Reeust :
   ]
 }
 */
-router.post("/quizzes", handlers.createQuiz);
+router.post("/", handlers.createQuiz);
 
 /* Fetch all quizzes
 Response :
@@ -49,7 +49,7 @@ Response :
   }
 ]
 */
-router.get("/quizzes", handlers.getAllQuizzes);
+router.get("/", handlers.getAllQuizzes);
 
 /* Fetch a specific quiz
 Response
@@ -71,7 +71,7 @@ Response
   ]
 }
 */
-router.get("/quizzes/:quizId", handlers.getQuizById);
+router.get("/:quizId", handlers.getQuizById);
 
 /* Submit quiz answers
 Request :
@@ -83,7 +83,7 @@ Request :
   ]
 }
 */
-router.post("/quizzes/:quizId/submit", handlers.submitQuizAnswers);
+router.post("/:quizId/submit", handlers.submitQuizAnswers);
 
 /* Fetch leaderboard for a quiz
 Response :
@@ -92,7 +92,7 @@ Response :
   { "userId": "user456", "score": 70, "completedAt": "2024-12-02T15:30:00Z" }
 ]
 */
-router.get("/quizzes/:quizId/leaderboard", handlers.getQuizLeaderboard);
+router.get("/leaderboard", handlers.getQuizLeaderboard);
 
 // Export the router object so it can be used in app.js
 module.exports = router;

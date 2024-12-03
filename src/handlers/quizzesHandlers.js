@@ -159,34 +159,45 @@ exports.submitQuizAnswers = async (req, res) => {
 };
 
 // Handler to fetch leaderboard for a quiz
-// Response:
-// [
-//   { "userId": "user123", "score": 80, "completedAt": "2024-12-03T12:00:00Z" },
-//   { "userId": "user456", "score": 70, "completedAt": "2024-12-02T15:30:00Z" }
-// ]
 exports.getQuizLeaderboard = async (req, res) => {
   try {
-    const quizId = req.params.quizId; // Extract quiz ID from URL parameters
-    const resultsSnapshot = await db
-      .collection("results")
-      .where("quizId", "==", quizId)
-      .orderBy("score", "desc")
-      .get(); // Get result documents for the quiz from Firestore, ordered by score
+    // Fetch all results from the 'results' collection
+    const resultsSnapshot = await db.collection("results").get();
 
     if (resultsSnapshot.empty) {
-      return res
-        .status(404)
-        .send({ message: "No results found for this quiz" }); // Send 404 response if no results are found
+      return res.status(404).send({ message: "No results found" }); // Send 404 response if no results are found
     }
 
-    // Map each result document to an object containing userId, score, and completedAt
-    const leaderboard = resultsSnapshot.docs.map((doc) => ({
-      userId: doc.data().userId,
-      score: doc.data().score,
-      completedAt: doc.data().submittedAt,
+    // Aggregate scores by userId
+    const userScores = {};
+    resultsSnapshot.docs.forEach((doc) => {
+      const data = doc.data();
+      const { userId, score } = data;
+
+      if (!userScores[userId]) {
+        userScores[userId] = { totalScore: 0, quizzesTaken: 0 };
+      }
+
+      userScores[userId].totalScore += score;
+      userScores[userId].quizzesTaken += 1;
+    });
+
+    // Convert the aggregated scores to an array and sort by totalScore in descending order
+    const leaderboard = Object.keys(userScores)
+      .map((userId) => ({
+        userId,
+        totalScore: userScores[userId].totalScore,
+        quizzesTaken: userScores[userId].quizzesTaken,
+      }))
+      .sort((a, b) => b.totalScore - a.totalScore);
+
+    // Add index to each user in the leaderboard
+    const indexedLeaderboard = leaderboard.map((user, index) => ({
+      rank: index + 1,
+      ...user,
     }));
 
-    res.status(200).send(leaderboard); // Send array of leaderboard objects as response
+    res.status(200).send(indexedLeaderboard); // Send array of indexed leaderboard objects as response
   } catch (error) {
     console.error("Error fetching quiz leaderboard:", error); // Log error to console
     res.status(500).send("Internal Server Error"); // Send error response

@@ -23,6 +23,7 @@ exports.createUser = async (req, res) => {
         dateOfBirth,
         profilePictureUrl: profilePictureUrl || null, // Include profile picture URL if provided
         predictCollection: [],
+        quizzesTaken: [], // Initialize quizzesTaken as an empty array
       });
 
     res.status(201).send({ message: "User created successfully" }); // Send success response
@@ -142,5 +143,34 @@ exports.getUserPredictCollection = async (req, res) => {
   } catch (error) {
     console.error("Error getting user's predictCollection items:", error);
     res.status(500).send({ message: "Internal Server Error" });
+  }
+};
+
+// Handler to get a user's results
+// URL parameter: :userId - ID of the user to retrieve results for
+// Response:
+// [
+//   {
+//     "quizId": "quiz1",
+//     "score": 80,
+//     "completedAt": "2024-12-03T12:00:00Z"
+//   }
+// ]
+exports.getUserResults = async (req, res) => {
+  try {
+    const userId = req.params.userId; // Extract user ID from URL parameters
+    const userDoc = await db.collection("users").doc(userId).get(); // Get user document from Firestore
+
+    if (!userDoc.exists) {
+      return res.status(404).send({ message: "User not found" }); // Send 404 response if user is not found
+    }
+
+    const userData = userDoc.data();
+    const quizzesTaken = userData.quizzesTaken || []; // Get quizzesTaken field from user document
+
+    res.status(200).send(quizzesTaken); // Send array of quizzesTaken objects as response
+  } catch (error) {
+    console.error("Error fetching user results:", error); // Log error to console
+    res.status(500).send("Internal Server Error"); // Send error response
   }
 };

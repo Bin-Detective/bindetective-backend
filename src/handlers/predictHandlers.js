@@ -15,24 +15,6 @@ exports.handleImagePredict = async (req, res) => {
     return res.status(400).send({ message: "No image file provided" });
   }
 
-  // Extract the user's token from the Authorization header
-  const idToken = req.headers.authorization?.split("Bearer ")[1];
-  if (!idToken) {
-    console.log("Unauthorized: No token provided");
-    return res.status(401).send({ message: "Unauthorized: No token provided" });
-  }
-
-  let userId;
-  try {
-    // Verify the user's token and extract the user ID
-    const decodedToken = await getAuth().verifyIdToken(idToken);
-    userId = decodedToken.uid;
-    console.log("User authenticated successfully:", userId);
-  } catch (error) {
-    console.log("Unauthorized: Invalid token");
-    return res.status(401).send({ message: "Unauthorized: Invalid token" });
-  }
-
   // Define the path and filename for the uploaded image
   const imagePath = req.file.path;
   const tempFileName = `${uuidv4()}${path.extname(req.file.originalname)}`;
@@ -72,7 +54,7 @@ exports.handleImagePredict = async (req, res) => {
 
     // Define the permanent destination for the image
     const permanentFileName = `${uuidv4()}${path.extname(
-      req.file.originalname
+      req.file.originalname,
     )}`;
     const permanentDestination = `predictedUploads/${permanentFileName}`;
 
@@ -89,6 +71,8 @@ exports.handleImagePredict = async (req, res) => {
     });
 
     console.log("Permanent URL generated:", permanentUrl);
+
+    const userId = "u7pzdJ3XGsNrtoQqx5ujUXqYOoJ3";
 
     // Store the prediction result in the Firestore 'predict_history' collection
     const predictHistoryRef = global.db.collection("predict_history").doc();

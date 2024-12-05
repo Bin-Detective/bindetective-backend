@@ -8,7 +8,7 @@ const { authenticateToken } = require("../middleware/authenticateToken"); // Imp
 const router = express.Router(); // Create a new router object to define route paths
 
 // Apply the middleware to all routes
-router.use(authenticateToken);
+// router.use(authenticateToken);
 
 // Define routes and associate each route with its respective handlers
 

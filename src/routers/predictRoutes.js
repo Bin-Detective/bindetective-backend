@@ -23,7 +23,7 @@ const upload = multer({ storage: storage });
 const router = express.Router(); // Create router object to define root paths
 
 // Apply the middleware to all routes
-router.use(authenticateToken);
+// router.use(authenticateToken);
 
 // Define routes and associate each route with its respective handlers.
 router.post("/", upload.single("image"), handlers.handleImagePredict);

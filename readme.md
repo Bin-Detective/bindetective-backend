@@ -565,7 +565,7 @@ This API allows for image prediction and managing prediction history.
 ### 2. Get All Predict History
 
 - URL : `/predict/collections`
-- Method : `POST`
+- Method : `GET`
 - Body : `multipart/form-data`
   - Key: `image`
   - Type: `file`

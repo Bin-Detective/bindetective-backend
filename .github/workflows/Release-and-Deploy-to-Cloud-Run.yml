@@ -10,7 +10,7 @@ env:
   PROJECT_ID: 'dicoding-submission-440805'
   REGION: 'asia-southeast2'
   SERVICE: 'bin-detective'
-  DOCKER_IMAGE: '${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/bin-detective/bin-detective'
+  DOCKER_IMAGE: 'asia-southeast2-docker.pkg.dev/dicoding-submission-440805/bin-detective/bin-detective'
 
 jobs:
   release_and_deploy:

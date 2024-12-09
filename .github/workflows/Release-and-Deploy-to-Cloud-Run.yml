@@ -1,7 +1,12 @@
 name: 'Release and Deploy to Cloud Run'
 
 on:
-  workflow_dispatch:  # This allows the manual trigger of the workflow
+  workflow_dispatch:  # This allows manual triggering of the workflow
+    inputs:
+      version:
+        description: 'Version for the release (e.g., v0.1.1)'
+        required: true
+        default: 'v0.1.0'  # Default version, can be overridden when triggered
 
 env:
   PROJECT_ID: 'dicoding-submission-440805'
@@ -71,6 +76,22 @@ jobs:
             --set-env-vars FASTAPI_PORT=7976
             --port=7070
           skip_default_labels: true
+
+      - name: 'Create GitHub Release'
+        run: |-
+          echo "Creating GitHub release for version ${{ env.VERSION }}"
+          curl -X POST \
+            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Content-Type: application/json" \
+            -d '{
+              "tag_name": "${{ env.VERSION }}",
+              "target_commitish": "main",
+              "name": "${{ env.VERSION }}",
+              "body": "Release for version ${{ env.VERSION }} of Bin Detective backend",
+              "draft": false,
+              "prerelease": false
+            }' \
+            "https://api.github.com/repos/${{ github.repository }}/releases"
 
       - name: 'Allow unauthenticated access'
         run: |

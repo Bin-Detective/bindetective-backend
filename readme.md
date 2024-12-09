@@ -1,3 +1,6 @@
+## Project Introduction
+
+
 # API Documentation
 
 - [User Management](#user-management)
@@ -29,8 +32,8 @@ All endpoints require an authorization token in the request header.
 - [Update User By ID](#3-update-user-by-id)
 - [Delete User By ID](#4-delete-user-by-id)
 - [Get All Users](#5-get-all-users)
-- [Get User Predict Collection](#6-get-user-predict-collection)
-- [Get User Quiz Result](#7-get-user-quiz-result)
+- [Get User Predict Collection](#6-get-all-user-predict-collection)
+- [Get User Quiz Result](#7-get-user-quiz-results)
 
 ### 1. Create User
 

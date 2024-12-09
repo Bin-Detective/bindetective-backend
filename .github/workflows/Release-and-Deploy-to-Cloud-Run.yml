@@ -64,7 +64,7 @@ jobs:
         with:
           service: 'bin-detective'
           region: 'asia-southeast2'
-          image: 'asia-southeast2-docker.pkg.dev/dicoding-submission-440805/bin-detective/bin-detective:${{ github.sha }}'
+          image: 'asia-southeast2-docker.pkg.dev/dicoding-submission-440805/bin-detective/bin-detective:${{ env.VERSION }}'
           flags: >-
             --cpu=2
             --memory=1024Mi

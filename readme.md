@@ -1,7 +1,37 @@
+## Table of Contents
+
+1. [Project Introduction](#project-introduction)
+2. [Architecture Design](#architecture-design)
+3. [Running Cost Projection](#running-cost-projection)
+4. [API Documentation](#api-documentation)
+
 ## Project Introduction
+The Bindetective Backend is a backend solution for our capstone project app, Bin Detective. It is designed to support a variety of functionalities, including user management, content management, machine learning-based waste image prediction, and quiz management. Built using the Express framework, this project leverages Firebase services for authentication, Firestore for database management, and Firebase Storage for handling file uploads.
+
+Additionally, the backend is deployed in the cloud using Google Cloud Run, enabling scalable, serverless execution of backend services. The application’s containerized environment ensures that it can handle varying levels of traffic without compromising performance. The backend integrates with another service built on FastAPI, also running on Cloud Run, to handle machine learning-based image predictions for waste classification. This integration ensures that the backend can leverage powerful, real-time ML models while maintaining scalability.
+
+The backend is designed to be scalable, secure, and efficient, providing robust APIs for frontend applications to interact with. This cloud deployment setup ensures flexibility, reduced maintenance overhead, and seamless scaling as the app grows.
+
+## Architecture Design
+
+TODO // add architecture design here
+
+## Running Cost Projection
+
+Our entire application, hosted on Google Cloud Platform, is estimated to cost approximately $96 per month to operate. Below are the details: (These are rough estimates based on the anticipated heaviest load for our app, so the actual cost may be lower.)
+
+| Products          | Name                        | Specs                              | Cost     |
+|-------------------|-----------------------------|------------------------------------|----------|
+| Artifact Registry | Express Server Image Repository | 10 GiB of Storage                 | 0.95$ /mo |
+| Artifact Registry | ML Server Image Repository  | 10 GiB of Storage                 | 0.95$ /mo |
+| Cloud Run         | Express Backend Server      | 2 CPU, 1 GB RAM, 1 Min instance   | 27.82$ /mo|
+| Cloud Run         | FastAPI ML Server           | 2 CPU, 2 GB RAM, 1 Min instance   | 37.7$ /mo |
+| Firestore         | Main Firestore Database     | 1 Mil read, 5k writes/day         | 27.96$ /mo|
+| Storage           | Images and Thumbnails Storage | 50 GiB Total Standard Storage    | 1.15$ /mo |
+|                   | Total                       |                                    | 96.53$ /mo|
 
 
-# API Documentation
+## API Documentation
 
 - [User Management](#user-management)
 - [Article Management](#article-management)

@@ -1,69 +1,81 @@
 name: 'Release and Deploy to Cloud Run'
 
 on:
-  workflow_dispatch:
-  release:
-    types:
-      - created  # Trigger when a new release is created
+  workflow_dispatch:  # This allows the manual trigger of the workflow
 
 env:
   PROJECT_ID: 'dicoding-submission-440805'
   REGION: 'asia-southeast2'
   SERVICE: 'bin-detective'
-  DOCKER_IMAGE: 'asia-southeast2-docker.pkg.dev/dicoding-submission-440805/bin-detective/bin-detective'
+  SERVICE_ACCOUNT: 'bindetective@dicoding-submission-440805.iam.gserviceaccount.com'  # Replace with the service account for Cloud Run
+  FIREBASE_STORAGE_BUCKET_ENV: 'dicoding-submission-440805.firebasestorage.app'
+  FASTAPI_SERVICE: 'https://bin-detective-ml-476908432279.asia-southeast2.run.app'
+  FASTAPI_PORT: '7976'
+  IS_ON_DEV: 'false'
+  IS_CRON_JOB_SCHEDULED: 'false'
+  VERSION: ${{ github.event.inputs.version }}  # Version passed when triggering the workflow
 
 jobs:
   release_and_deploy:
     runs-on: 'ubuntu-latest'
 
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+
     steps:
-      # Step 1: Checkout the code to get access to the version control
-      - name: Checkout the repository
-        uses: actions/checkout@v2
+      - name: 'Checkout'
+        uses: 'actions/checkout@v4'
 
-      # Step 2: Get the latest tag and calculate the new patch version
-      - name: Get latest tag and increment patch version
-        id: version
+      # Authenticate to Google Cloud using the service account key
+      - id: 'auth'
+        name: 'Authenticate to Google Cloud'
+        uses: google-github-actions/auth@v0
+        with:
+         credentials_json: '${{ secrets.GCP_SA_KEY }}'
+         token_format: 'access_token'
+
+      - name: 'Set up Google Cloud SDK'
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: "${{ env.PROJECT_ID }}"
+
+      # Docker Auth and Build
+      - name: 'Docker Auth'
+        uses: 'docker/login-action@v1'
+        with:
+          username: _json_key
+          password: ${{ secrets.GCP_SA_KEY }}
+          registry: '${{ env.REGION }}-docker.pkg.dev'
+
+      - name: 'Build and Push Container'
+        run: |-
+          DOCKER_TAG="${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/bin-detective/bin-detective:${{ env.VERSION }}"
+          docker build --tag "${DOCKER_TAG}" .
+          docker push "${DOCKER_TAG}"
+
+      - name: 'Deploy to Cloud Run'
+        uses: 'google-github-actions/deploy-cloudrun@v2'
+        with:
+          service: 'bin-detective'
+          region: 'asia-southeast2'
+          image: 'asia-southeast2-docker.pkg.dev/dicoding-submission-440805/bin-detective/bin-detective:${{ env.VERSION }}'
+          flags: >-
+            --cpu=2
+            --memory=1024Mi
+            --min-instances=0
+            --max-instances=1
+            --set-env-vars FIREBASE_STORAGE_BUCKET=dicoding-submission-440805.firebasestorage.app
+            --set-env-vars IS_ON_DEV=false
+            --set-env-vars FASTAPI_SERVICE=https://bin-detective-ml-476908432279.asia-southeast2.run.app
+            --set-env-vars FASTAPI_PORT=7976
+            --port=7070
+          skip_default_labels: true
+
+      - name: 'Allow unauthenticated access'
         run: |
-          # Get the latest version tag
-          VERSION=$(git describe --tags --abbrev=0)
-          echo "Latest version is $VERSION"
+          gcloud run services add-iam-policy-binding ${{ env.SERVICE }} --region=${{ env.REGION }} --member=allUsers --role=roles/run.invoker
 
-          # Extract the version numbers
-          VERSION_NUM=$(echo $VERSION | sed 's/v//')
-          MAJOR=$(echo $VERSION_NUM | cut -d. -f1)
-          MINOR=$(echo $VERSION_NUM | cut -d. -f2)
-          PATCH=$(echo $VERSION_NUM | cut -d. -f3)
-
-          # Increment the patch version
-          PATCH=$((PATCH+1))
-
-          # New version
-          NEW_VERSION="v$MAJOR.$MINOR.$PATCH"
-          echo "New version is $NEW_VERSION"
-
-          # Set the new version tag for release
-          echo "::set-output name=version::$NEW_VERSION"
-
-      # Step 3: Create GitHub Release
-      - name: Create GitHub Release
-        uses: actions/create-release@v1
-        with:
-          tag_name: ${{ steps.version.outputs.version }}
-          release_name: Release ${{ steps.version.outputs.version }}
-          body: |
-            ## Docker Image
-            The Docker image for this release is available on Google Artifact Registry:
-            ```bash
-            docker pull gcr.io/${{ env.PROJECT_ID }}/${{ env.REGION }}/bin-detective/bin-detective:${{ steps.version.outputs.version }}
-            ```
-
-      # Step 4: Trigger deployment via dispatching the "deploy" workflow
-      - name: Trigger deployment workflow
-        uses: peter-evans/workflow-dispatch@v1
-        with:
-          repository: ${{ github.repository }}
-          workflow: google-cloudrun-docker.yml  # Reference the name of the deploy workflow file
-          ref: ${{ github.ref }}
-          inputs:
-            version: ${{ steps.version.outputs.version }}
+      - name: 'Show output'
+        run: |
+          echo ${{ steps.deploy.outputs.url }}

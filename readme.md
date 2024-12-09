@@ -18,7 +18,7 @@ TODO // add architecture design here
 
 ## Running Cost Projection
 
-Our entire application, hosted on Google Cloud Platform, is estimated to cost approximately $96 per month to operate. Below are the details: (These are rough estimates based on the anticipated heaviest load for our app, so the actual cost may be lower.)
+Our entire application, hosted on Google Cloud Platform, is estimated to cost approximately $96 per month to operate. Below are the details: *(These are rough estimates based on the anticipated heaviest load for our app, so the actual cost may be lower.)*
 
 | Products          | Name                        | Specs                              | Cost     |
 |-------------------|-----------------------------|------------------------------------|----------|

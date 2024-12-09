@@ -1,3 +1,5 @@
+# BinDetective Express API Server
+
 ## Table of Contents
 
 1. [Project Introduction](#project-introduction)

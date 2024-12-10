@@ -12,12 +12,12 @@ This project come up with 6 members that consisting of  3 Machine learning 2 Clo
 
 Team ID		: C242-PS471
 Team Member	: 
-(ML) M296B4KX1782 – Hilda Desfianty Arifin – UPN “Veteran” Jawa Timur - Active
-(ML) M296b4KX1239 – Eka Maurita – UPN “Veteran” Jawa Timur - Active
-(ML) M296B4KY0800 – Bahiskara Ananda Arryanto – UPN “Veteran” Jawa Timur - Active
-(CC) C296B4KY2940 – Muhammad Mega Nugraha – UPN “Veteran” Jawa Timur - Active
-(CC)  C296B4KY3685 – Rangga Agni Nalendra – UPN “Veteran” Jawa Timur - Active
-(MD) A296B4KY0982 – Danendra Alvyn Anshari – UPN “Veteran” Jawa Timur - Active
+- (ML) M296B4KX1782 – Hilda Desfianty Arifin – UPN “Veteran” Jawa Timur - Active
+- (ML) M296b4KX1239 – Eka Maurita – UPN “Veteran” Jawa Timur - Active
+- (ML) M296B4KY0800 – Bahiskara Ananda Arryanto – UPN “Veteran” Jawa Timur - Active
+- (CC) C296B4KY2940 – Muhammad Mega Nugraha – UPN “Veteran” Jawa Timur - Active
+- (CC)  C296B4KY3685 – Rangga Agni Nalendra – UPN “Veteran” Jawa Timur - Active
+- (MD) A296B4KY0982 – Danendra Alvyn Anshari – UPN “Veteran” Jawa Timur - Active
 
 The Bindetective Backend is a backend solution for our capstone project app, Bin Detective. It is designed to support a variety of functionalities, including user management, content management, machine learning-based waste image prediction, and quiz management. Built using the Express framework, this project leverages Firebase services for authentication, Firestore for database management, and Firebase Storage for handling file uploads.
 

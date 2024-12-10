@@ -8,24 +8,13 @@
 4. [API Documentation](#api-documentation)
 
 ## Project Introduction
-This project come up with 6 members that consisting of  3 Machine learning 2 Cloud Computing and 1 Mobile Development,Before we explain our project lets meet our team first : 
 
-Team ID		: C242-PS471
-Team Member	: 
-- (ML) M296B4KX1782 – Hilda Desfianty Arifin – UPN “Veteran” Jawa Timur - Active
-- (ML) M296b4KX1239 – Eka Maurita – UPN “Veteran” Jawa Timur - Active
-- (ML) M296B4KY0800 – Bahiskara Ananda Arryanto – UPN “Veteran” Jawa Timur - Active
-- (CC) C296B4KY2940 – Muhammad Mega Nugraha – UPN “Veteran” Jawa Timur - Active
-- (CC)  C296B4KY3685 – Rangga Agni Nalendra – UPN “Veteran” Jawa Timur - Active
-- (MD) A296B4KY0982 – Danendra Alvyn Anshari – UPN “Veteran” Jawa Timur - Active
 
 The Bindetective Backend is a backend solution for our capstone project app, Bin Detective. It is designed to support a variety of functionalities, including user management, content management, machine learning-based waste image prediction, and quiz management. Built using the Express framework, this project leverages Firebase services for authentication, Firestore for database management, and Firebase Storage for handling file uploads.
 
 Additionally, the backend is deployed in the cloud using Google Cloud Run, enabling scalable, serverless execution of backend services. The application’s containerized environment ensures that it can handle varying levels of traffic without compromising performance. The backend integrates with another service built on FastAPI, also running on Cloud Run, to handle machine learning-based image predictions for waste classification. This integration ensures that the backend can leverage powerful, real-time ML models while maintaining scalability.
 
 The backend is designed to be scalable, secure, and efficient, providing robust APIs for frontend applications to interact with. This cloud deployment setup ensures flexibility, reduced maintenance overhead, and seamless scaling as the app grows.
-
-Our team came up with "Bin Detective" after noticing a significant gap in waste management awareness among children and teenagers, which has led to improper waste handling and its environmental impacts. We observed that traditional methods of educating young people about waste segregation were not engaging enough to create lasting habits. Recognizing the potential of gamified learning, we developed "Bin Detective" to make waste management education both fun and impactful. Through interactive quizzes, rewards, and educational content, we aim to empower young users to adopt sustainable practices that benefit their communities and the environment.
 
 
 

@@ -18,7 +18,7 @@ The backend is designed to be scalable, secure, and efficient, providing robust 
 
 
 
-## Architecture Design
+## Cloud Infrastructure Design
 
 ![image](https://github.com/user-attachments/assets/4e873284-b49d-4bda-923e-99bd4944dd1d)
 

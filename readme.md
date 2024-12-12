@@ -1,4 +1,4 @@
-![image](https://github.com/user-attachments/assets/f419f898-3f0e-4b11-aa15-8776a1fdd096)# BinDetective Express API Server
+# BinDetective Express API Server
 
 ## Table of Contents
 
@@ -20,8 +20,7 @@ The backend is designed to be scalable, secure, and efficient, providing robust 
 
 ## Architecture Design
 
-![image](https://github.com/user-attachments/assets/c08fad0d-20c7-4c33-a75c-f126806ce38e)
-
+![image](https://github.com/user-attachments/assets/4e873284-b49d-4bda-923e-99bd4944dd1d)
 
 ## Running Cost Projection
 
